@@ -1,0 +1,37 @@
+From eaaeae50ea0230be49e4aca5ec48f6978537a242 Mon Sep 17 00:00:00 2001
+From: Daniel Borkmann <dborkman@redhat.com>
+Date: Thu, 7 Feb 2013 00:55:37 +0000
+Subject: [PATCH 2889/3390] net: sctp: sctp_auth_key_put: use kzfree instead of
+ kfree
+
+[ Upstream commit 586c31f3bf04c290dc0a0de7fc91d20aa9a5ee53 ]
+
+For sensitive data like keying material, it is common practice to zero
+out keys before returning the memory back to the allocator. Thus, use
+kzfree instead of kfree.
+
+Signed-off-by: Daniel Borkmann <dborkman@redhat.com>
+Acked-by: Neil Horman <nhorman@tuxdriver.com>
+Acked-by: Vlad Yasevich <vyasevich@gmail.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ net/sctp/auth.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/sctp/auth.c b/net/sctp/auth.c
+index 865e68f..418ebe4 100644
+--- a/net/sctp/auth.c
++++ b/net/sctp/auth.c
+@@ -71,7 +71,7 @@ void sctp_auth_key_put(struct sctp_auth_bytes *key)
+ 		return;
+ 
+ 	if (atomic_dec_and_test(&key->refcnt)) {
+-		kfree(key);
++		kzfree(key);
+ 		SCTP_DBG_OBJCNT_DEC(keys);
+ 	}
+ }
+-- 
+2.5.0
+

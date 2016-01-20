@@ -1,0 +1,43 @@
+From ae797dcdae86481103b6ed79d97ac09e57e2feef Mon Sep 17 00:00:00 2001
+From: Alan Cox <alan@linux.intel.com>
+Date: Wed, 25 Apr 2012 14:33:33 +0100
+Subject: [PATCH 1510/3390] acpi_video: fix leaking PCI references
+
+commit cfb46f433a4da97c31780e08a259fac2cb6bd61f upstream.
+
+Signed-off-by: Alan Cox <alan@linux.intel.com>
+Acked-by: Matthew Garrett <mjg@redhat.com>
+Signed-off-by: Len Brown <len.brown@intel.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/acpi/video.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/acpi/video.c b/drivers/acpi/video.c
+index db39e9e..623a335 100644
+--- a/drivers/acpi/video.c
++++ b/drivers/acpi/video.c
+@@ -1732,6 +1732,7 @@ static int acpi_video_bus_remove(struct acpi_device *device, int type)
+ 
+ static int __init intel_opregion_present(void)
+ {
++	int i915 = 0;
+ #if defined(CONFIG_DRM_I915) || defined(CONFIG_DRM_I915_MODULE)
+ 	struct pci_dev *dev = NULL;
+ 	u32 address;
+@@ -1744,10 +1745,10 @@ static int __init intel_opregion_present(void)
+ 		pci_read_config_dword(dev, 0xfc, &address);
+ 		if (!address)
+ 			continue;
+-		return 1;
++		i915 = 1;
+ 	}
+ #endif
+-	return 0;
++	return i915;
+ }
+ 
+ int acpi_video_register(void)
+-- 
+2.5.0
+

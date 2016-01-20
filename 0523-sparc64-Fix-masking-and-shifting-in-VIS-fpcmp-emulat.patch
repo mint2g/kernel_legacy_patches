@@ -1,0 +1,109 @@
+From d4afed4d20e91a12de7cd1c64bb3451ee2236d19 Mon Sep 17 00:00:00 2001
+From: "David S. Miller" <davem@davemloft.net>
+Date: Mon, 31 Oct 2011 01:05:49 -0700
+Subject: [PATCH 0523/3390] sparc64: Fix masking and shifting in VIS fpcmp
+ emulation.
+
+[ Upstream commit 2e8ecdc008a16b9a6c4b9628bb64d0d1c05f9f92 ]
+
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ arch/sparc/kernel/visemul.c | 32 ++++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
+
+diff --git a/arch/sparc/kernel/visemul.c b/arch/sparc/kernel/visemul.c
+index 3635771..9384a0c 100644
+--- a/arch/sparc/kernel/visemul.c
++++ b/arch/sparc/kernel/visemul.c
+@@ -713,17 +713,17 @@ static void pcmp(struct pt_regs *regs, unsigned int insn, unsigned int opf)
+ 			s16 b = (rs2 >> (i * 16)) & 0xffff;
+ 
+ 			if (a > b)
+-				rd_val |= 1 << i;
++				rd_val |= 8 >> i;
+ 		}
+ 		break;
+ 
+ 	case FCMPGT32_OPF:
+ 		for (i = 0; i < 2; i++) {
+-			s32 a = (rs1 >> (i * 32)) & 0xffff;
+-			s32 b = (rs2 >> (i * 32)) & 0xffff;
++			s32 a = (rs1 >> (i * 32)) & 0xffffffff;
++			s32 b = (rs2 >> (i * 32)) & 0xffffffff;
+ 
+ 			if (a > b)
+-				rd_val |= 1 << i;
++				rd_val |= 2 >> i;
+ 		}
+ 		break;
+ 
+@@ -733,17 +733,17 @@ static void pcmp(struct pt_regs *regs, unsigned int insn, unsigned int opf)
+ 			s16 b = (rs2 >> (i * 16)) & 0xffff;
+ 
+ 			if (a <= b)
+-				rd_val |= 1 << i;
++				rd_val |= 8 >> i;
+ 		}
+ 		break;
+ 
+ 	case FCMPLE32_OPF:
+ 		for (i = 0; i < 2; i++) {
+-			s32 a = (rs1 >> (i * 32)) & 0xffff;
+-			s32 b = (rs2 >> (i * 32)) & 0xffff;
++			s32 a = (rs1 >> (i * 32)) & 0xffffffff;
++			s32 b = (rs2 >> (i * 32)) & 0xffffffff;
+ 
+ 			if (a <= b)
+-				rd_val |= 1 << i;
++				rd_val |= 2 >> i;
+ 		}
+ 		break;
+ 
+@@ -753,17 +753,17 @@ static void pcmp(struct pt_regs *regs, unsigned int insn, unsigned int opf)
+ 			s16 b = (rs2 >> (i * 16)) & 0xffff;
+ 
+ 			if (a != b)
+-				rd_val |= 1 << i;
++				rd_val |= 8 >> i;
+ 		}
+ 		break;
+ 
+ 	case FCMPNE32_OPF:
+ 		for (i = 0; i < 2; i++) {
+-			s32 a = (rs1 >> (i * 32)) & 0xffff;
+-			s32 b = (rs2 >> (i * 32)) & 0xffff;
++			s32 a = (rs1 >> (i * 32)) & 0xffffffff;
++			s32 b = (rs2 >> (i * 32)) & 0xffffffff;
+ 
+ 			if (a != b)
+-				rd_val |= 1 << i;
++				rd_val |= 2 >> i;
+ 		}
+ 		break;
+ 
+@@ -773,17 +773,17 @@ static void pcmp(struct pt_regs *regs, unsigned int insn, unsigned int opf)
+ 			s16 b = (rs2 >> (i * 16)) & 0xffff;
+ 
+ 			if (a == b)
+-				rd_val |= 1 << i;
++				rd_val |= 8 >> i;
+ 		}
+ 		break;
+ 
+ 	case FCMPEQ32_OPF:
+ 		for (i = 0; i < 2; i++) {
+-			s32 a = (rs1 >> (i * 32)) & 0xffff;
+-			s32 b = (rs2 >> (i * 32)) & 0xffff;
++			s32 a = (rs1 >> (i * 32)) & 0xffffffff;
++			s32 b = (rs2 >> (i * 32)) & 0xffffffff;
+ 
+ 			if (a == b)
+-				rd_val |= 1 << i;
++				rd_val |= 2 >> i;
+ 		}
+ 		break;
+ 	}
+-- 
+2.5.0
+

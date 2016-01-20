@@ -1,0 +1,43 @@
+From b9f1f48ce20a1b923429c216669d03b5a900a8cf Mon Sep 17 00:00:00 2001
+From: Bing Zhao <bzhao@marvell.com>
+Date: Fri, 15 Mar 2013 18:47:07 -0700
+Subject: [PATCH 2774/3390] mwifiex: cancel cmd timer and free curr_cmd in
+ shutdown process
+
+commit 084c7189acb3f969c855536166042e27f5dd703f upstream.
+
+curr_cmd points to the command that is in processing or waiting
+for its command response from firmware. If the function shutdown
+happens to occur at this time we should cancel the cmd timer and
+put the command back to free queue.
+
+Tested-by: Marco Cesarano <marco@marvell.com>
+Signed-off-by: Bing Zhao <bzhao@marvell.com>
+Signed-off-by: John W. Linville <linville@tuxdriver.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/net/wireless/mwifiex/init.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/drivers/net/wireless/mwifiex/init.c b/drivers/net/wireless/mwifiex/init.c
+index 3f1559e..45dfc2b 100644
+--- a/drivers/net/wireless/mwifiex/init.c
++++ b/drivers/net/wireless/mwifiex/init.c
+@@ -561,6 +561,14 @@ mwifiex_shutdown_drv(struct mwifiex_adapter *adapter)
+ 		return ret;
+ 	}
+ 
++	/* cancel current command */
++	if (adapter->curr_cmd) {
++		dev_warn(adapter->dev, "curr_cmd is still in processing\n");
++		del_timer(&adapter->cmd_timer);
++		mwifiex_insert_cmd_to_free_q(adapter, adapter->curr_cmd);
++		adapter->curr_cmd = NULL;
++	}
++
+ 	/* shut down mwifiex */
+ 	dev_dbg(adapter->dev, "info: shutdown mwifiex...\n");
+ 
+-- 
+2.5.0
+

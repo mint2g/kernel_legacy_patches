@@ -1,0 +1,57 @@
+From 2b23550e4d01f4c0c1560c899db43e1a63f7ccd0 Mon Sep 17 00:00:00 2001
+From: Alex Deucher <alexander.deucher@amd.com>
+Date: Wed, 22 May 2013 11:22:51 -0400
+Subject: [PATCH 3029/3390] drm/radeon: fix card_posted check for newer asics
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+commit 09fb8bd1a63b0f9f15e655c4fe8d047e5d2bf67a upstream.
+
+Newer asics have variable numbers of crtcs.  Use that
+rather than the asic family to determine which crtcs
+to check.  This avoids checking non-existent crtcs or
+missing crtcs on certain asics.
+
+Reviewed-by: Michel Dänzer <michel.daenzer@amd.com>
+Signed-off-by: Alex Deucher <alexander.deucher@amd.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/gpu/drm/radeon/radeon_device.c | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/gpu/drm/radeon/radeon_device.c b/drivers/gpu/drm/radeon/radeon_device.c
+index e87893c..a275cf6 100644
+--- a/drivers/gpu/drm/radeon/radeon_device.c
++++ b/drivers/gpu/drm/radeon/radeon_device.c
+@@ -352,18 +352,17 @@ bool radeon_card_posted(struct radeon_device *rdev)
+ 	uint32_t reg;
+ 
+ 	/* first check CRTCs */
+-	if (ASIC_IS_DCE41(rdev)) {
++	if (ASIC_IS_DCE4(rdev)) {
+ 		reg = RREG32(EVERGREEN_CRTC_CONTROL + EVERGREEN_CRTC0_REGISTER_OFFSET) |
+ 			RREG32(EVERGREEN_CRTC_CONTROL + EVERGREEN_CRTC1_REGISTER_OFFSET);
+-		if (reg & EVERGREEN_CRTC_MASTER_EN)
+-			return true;
+-	} else if (ASIC_IS_DCE4(rdev)) {
+-		reg = RREG32(EVERGREEN_CRTC_CONTROL + EVERGREEN_CRTC0_REGISTER_OFFSET) |
+-			RREG32(EVERGREEN_CRTC_CONTROL + EVERGREEN_CRTC1_REGISTER_OFFSET) |
+-			RREG32(EVERGREEN_CRTC_CONTROL + EVERGREEN_CRTC2_REGISTER_OFFSET) |
+-			RREG32(EVERGREEN_CRTC_CONTROL + EVERGREEN_CRTC3_REGISTER_OFFSET) |
+-			RREG32(EVERGREEN_CRTC_CONTROL + EVERGREEN_CRTC4_REGISTER_OFFSET) |
+-			RREG32(EVERGREEN_CRTC_CONTROL + EVERGREEN_CRTC5_REGISTER_OFFSET);
++			if (rdev->num_crtc >= 4) {
++				reg |= RREG32(EVERGREEN_CRTC_CONTROL + EVERGREEN_CRTC2_REGISTER_OFFSET) |
++					RREG32(EVERGREEN_CRTC_CONTROL + EVERGREEN_CRTC3_REGISTER_OFFSET);
++			}
++			if (rdev->num_crtc >= 6) {
++				reg |= RREG32(EVERGREEN_CRTC_CONTROL + EVERGREEN_CRTC4_REGISTER_OFFSET) |
++					RREG32(EVERGREEN_CRTC_CONTROL + EVERGREEN_CRTC5_REGISTER_OFFSET);
++			}
+ 		if (reg & EVERGREEN_CRTC_MASTER_EN)
+ 			return true;
+ 	} else if (ASIC_IS_AVIVO(rdev)) {
+-- 
+2.5.0
+

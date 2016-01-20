@@ -1,0 +1,49 @@
+From 5af14b89d07f9ea69a582687adb1edcaa82f03b9 Mon Sep 17 00:00:00 2001
+From: "Rafael J. Wysocki" <rjw@sisk.pl>
+Date: Wed, 15 Aug 2012 21:31:45 +0200
+Subject: [PATCH 1917/3390] PM / Runtime: Fix rpm_resume() return value for
+ power.no_callbacks set
+
+commit 7f321c26c04807834fef4c524d2b21573423fc74 upstream.
+
+For devices whose power.no_callbacks flag is set, rpm_resume()
+should return 1 if the device's parent is already active, so that
+the callers of pm_runtime_get() don't think that they have to wait
+for the device to resume (asynchronously) in that case (the core
+won't queue up an asynchronous resume in that case, so there's
+nothing to wait for anyway).
+
+Modify the code accordingly (and make sure that an idle notification
+will be queued up on success, even if 1 is to be returned).
+
+Signed-off-by: Rafael J. Wysocki <rjw@sisk.pl>
+Acked-by: Alan Stern <stern@rowland.harvard.edu>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/base/power/runtime.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/base/power/runtime.c b/drivers/base/power/runtime.c
+index 1023392..be39bdd 100644
+--- a/drivers/base/power/runtime.c
++++ b/drivers/base/power/runtime.c
+@@ -533,6 +533,7 @@ static int rpm_resume(struct device *dev, int rpmflags)
+ 		    || dev->parent->power.runtime_status == RPM_ACTIVE) {
+ 			atomic_inc(&dev->parent->power.child_count);
+ 			spin_unlock(&dev->parent->power.lock);
++			retval = 1;
+ 			goto no_callback;	/* Assume success. */
+ 		}
+ 		spin_unlock(&dev->parent->power.lock);
+@@ -610,7 +611,7 @@ static int rpm_resume(struct device *dev, int rpmflags)
+ 	}
+ 	wake_up_all(&dev->power.wait_queue);
+ 
+-	if (!retval)
++	if (retval >= 0)
+ 		rpm_idle(dev, RPM_ASYNC);
+ 
+  out:
+-- 
+2.5.0
+

@@ -1,0 +1,32 @@
+From 5f29f2e19e7c6231559992be25acb2bfb0fa37d9 Mon Sep 17 00:00:00 2001
+From: Wolfram Sang <w.sang@pengutronix.de>
+Date: Sat, 26 Nov 2011 11:39:14 +0100
+Subject: [PATCH 0431/3390] arm: mx23: recognise stmp378x as mx23
+
+commit 11357be9246c7d1acf9b37ad54a18b29bbb734be upstream.
+
+Adding the machine_is_* line was forgotten when converting mach-stmp378x to
+mach-mxs.
+
+Signed-off-by: Wolfram Sang <w.sang@pengutronix.de>
+Signed-off-by: Shawn Guo <shawn.guo@linaro.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ arch/arm/mach-mxs/include/mach/mxs.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm/mach-mxs/include/mach/mxs.h b/arch/arm/mach-mxs/include/mach/mxs.h
+index 35a89dd..1332f73 100644
+--- a/arch/arm/mach-mxs/include/mach/mxs.h
++++ b/arch/arm/mach-mxs/include/mach/mxs.h
+@@ -30,6 +30,7 @@
+  */
+ #define cpu_is_mx23()		(					\
+ 		machine_is_mx23evk() ||					\
++		machine_is_stmp378x() ||				\
+ 		0)
+ #define cpu_is_mx28()		(					\
+ 		machine_is_mx28evk() ||					\
+-- 
+2.5.0
+

@@ -1,0 +1,48 @@
+From 1434cc17865f1b212d81807057a5f69ba58f5b3c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20Bie=C3=9Fmann?= <andreas@biessmann.de>
+Date: Fri, 31 Aug 2012 13:35:42 +0200
+Subject: [PATCH 2077/3390] mtd: omap2: fix module loading
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+commit 4d3d688da8e7016f15483e9319b41311e1db9515 upstream.
+
+Unloading the omap2 nand driver missed to release the memory region which will
+result in not being able to request it again if one want to load the driver
+later on.
+
+This patch fixes following error when loading omap2 module after unloading:
+---8<---
+~ $ rmmod omap2
+~ $ modprobe omap2
+[   37.420928] omap2-nand: probe of omap2-nand.0 failed with error -16
+~ $
+--->8---
+
+This error was introduced in 67ce04bf2746f8a1f8c2a104b313d20c63f68378 which
+was the first commit of this driver.
+
+Signed-off-by: Andreas Bießmann <andreas@biessmann.de>
+Signed-off-by: Artem Bityutskiy <artem.bityutskiy@linux.intel.com>
+Signed-off-by: David Woodhouse <David.Woodhouse@intel.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/mtd/nand/omap2.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/mtd/nand/omap2.c b/drivers/mtd/nand/omap2.c
+index 8ae28a5..0289707 100644
+--- a/drivers/mtd/nand/omap2.c
++++ b/drivers/mtd/nand/omap2.c
+@@ -1139,6 +1139,7 @@ static int omap_nand_remove(struct platform_device *pdev)
+ 	/* Release NAND device, its internal structures and partitions */
+ 	nand_release(&info->mtd);
+ 	iounmap(info->nand.IO_ADDR_R);
++	release_mem_region(info->phys_base, NAND_IO_SIZE);
+ 	kfree(info);
+ 	return 0;
+ }
+-- 
+2.5.0
+

@@ -1,0 +1,36 @@
+From 015be9f48be43814f14326555e9ea576cf0343d7 Mon Sep 17 00:00:00 2001
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Date: Fri, 4 Nov 2011 21:24:36 +0300
+Subject: [PATCH 0284/3390] xen-gntalloc: signedness bug in add_grefs()
+
+commit 99cb2ddcc617f43917e94a4147aa3ccdb2bcd77e upstream.
+
+gref->gref_id is unsigned so the error handling didn't work.
+gnttab_grant_foreign_access() returns an int type, so we can add a
+cast here, and it doesn't cause any problems.
+gnttab_grant_foreign_access() can return a variety of errors
+including -ENOSPC, -ENOSYS and -ENOMEM.
+
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ drivers/xen/gntalloc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/xen/gntalloc.c b/drivers/xen/gntalloc.c
+index 23c60cf..e1c4c6e 100644
+--- a/drivers/xen/gntalloc.c
++++ b/drivers/xen/gntalloc.c
+@@ -135,7 +135,7 @@ static int add_grefs(struct ioctl_gntalloc_alloc_gref *op,
+ 		/* Grant foreign access to the page. */
+ 		gref->gref_id = gnttab_grant_foreign_access(op->domid,
+ 			pfn_to_mfn(page_to_pfn(gref->page)), readonly);
+-		if (gref->gref_id < 0) {
++		if ((int)gref->gref_id < 0) {
+ 			rc = gref->gref_id;
+ 			goto undo;
+ 		}
+-- 
+2.5.0
+

@@ -1,0 +1,31 @@
+From dae187ec04a6f7752b140d789269730791a7388f Mon Sep 17 00:00:00 2001
+From: Axel Lin <axel.lin@gmail.com>
+Date: Wed, 26 Oct 2011 09:53:41 +0800
+Subject: [PATCH 0099/3390] ASoC: wm8940: Properly set codec->dapm.bias_level
+
+commit 5927f94700e860ae27ff24e7f3bc9e4f7b9922eb upstream.
+
+Reported-by: Chris Paulson-Ellis <chris@edesix.com>
+Signed-off-by: Axel Lin <axel.lin@gmail.com>
+Signed-off-by: Mark Brown <broonie@opensource.wolfsonmicro.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ sound/soc/codecs/wm8940.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/sound/soc/codecs/wm8940.c b/sound/soc/codecs/wm8940.c
+index 25580e3..d4ecb3f 100644
+--- a/sound/soc/codecs/wm8940.c
++++ b/sound/soc/codecs/wm8940.c
+@@ -472,6 +472,8 @@ static int wm8940_set_bias_level(struct snd_soc_codec *codec,
+ 		break;
+ 	}
+ 
++	codec->dapm.bias_level = level;
++
+ 	return ret;
+ }
+ 
+-- 
+2.5.0
+

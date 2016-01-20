@@ -1,0 +1,60 @@
+From 6d4f2ce4c47b1983753e95ce959380e7449d158a Mon Sep 17 00:00:00 2001
+From: Emil Tantilov <emil.s.tantilov@intel.com>
+Date: Fri, 4 Nov 2011 06:43:29 +0000
+Subject: [PATCH 2298/3390] ixgbe: add support for new 82599 device id
+
+commit 9e791e4a04c08868f02cd579a428a7268492e1b4 upstream.
+
+Support for new 82599 based quad port adapter.
+
+Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
+Tested-by: Phil Schmitt <phillip.j.schmitt@intel.com>
+Signed-off-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+Signed-off-by: Abdallah Chatila <Abdallah.Chatila@ericsson.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/net/ixgbe/ixgbe_82599.c | 1 +
+ drivers/net/ixgbe/ixgbe_main.c  | 2 ++
+ drivers/net/ixgbe/ixgbe_type.h  | 1 +
+ 3 files changed, 4 insertions(+)
+
+diff --git a/drivers/net/ixgbe/ixgbe_82599.c b/drivers/net/ixgbe/ixgbe_82599.c
+index 5ef179f..4adce71 100644
+--- a/drivers/net/ixgbe/ixgbe_82599.c
++++ b/drivers/net/ixgbe/ixgbe_82599.c
+@@ -361,6 +361,7 @@ static enum ixgbe_media_type ixgbe_get_media_type_82599(struct ixgbe_hw *hw)
+ 	case IXGBE_DEV_ID_82599_SFP_EM:
+ 	case IXGBE_DEV_ID_82599_SFP_SF2:
+ 	case IXGBE_DEV_ID_82599EN_SFP:
++	case IXGBE_DEV_ID_82599_SFP_SF_QP:
+ 		media_type = ixgbe_media_type_fiber;
+ 		break;
+ 	case IXGBE_DEV_ID_82599_CX4:
+diff --git a/drivers/net/ixgbe/ixgbe_main.c b/drivers/net/ixgbe/ixgbe_main.c
+index 0dfed9f..f0b0ff3 100644
+--- a/drivers/net/ixgbe/ixgbe_main.c
++++ b/drivers/net/ixgbe/ixgbe_main.c
+@@ -131,6 +131,8 @@ static DEFINE_PCI_DEVICE_TABLE(ixgbe_pci_tbl) = {
+ 	 board_82599 },
+ 	{PCI_VDEVICE(INTEL, IXGBE_DEV_ID_82599EN_SFP),
+ 	 board_82599 },
++	{PCI_VDEVICE(INTEL, IXGBE_DEV_ID_82599_SFP_SF_QP),
++	 board_82599 },
+ 	{PCI_VDEVICE(INTEL, IXGBE_DEV_ID_X540T1),
+ 	 board_X540 },
+ 
+diff --git a/drivers/net/ixgbe/ixgbe_type.h b/drivers/net/ixgbe/ixgbe_type.h
+index c9b1d2d..1ea1577 100644
+--- a/drivers/net/ixgbe/ixgbe_type.h
++++ b/drivers/net/ixgbe/ixgbe_type.h
+@@ -64,6 +64,7 @@
+ #define IXGBE_DEV_ID_82599_COMBO_BACKPLANE 0x10F8
+ #define IXGBE_SUBDEV_ID_82599_KX4_KR_MEZZ  0x000C
+ #define IXGBE_DEV_ID_82599_LS            0x154F
++#define IXGBE_DEV_ID_82599_SFP_SF_QP     0x154A
+ #define IXGBE_DEV_ID_X540T               0x1528
+ #define IXGBE_DEV_ID_X540T1              0x1560
+ 
+-- 
+2.5.0
+

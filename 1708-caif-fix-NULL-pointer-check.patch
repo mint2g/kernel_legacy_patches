@@ -1,0 +1,33 @@
+From 4b53a23467b73b472f276d5530a103a736fe8ae1 Mon Sep 17 00:00:00 2001
+From: Alan Cox <alan@linux.intel.com>
+Date: Tue, 24 Jul 2012 02:42:14 +0000
+Subject: [PATCH 1708/3390] caif: fix NULL pointer check
+
+[ Upstream commit c66b9b7d365444b433307ebb18734757cb668a02 ]
+
+Reported-by: <rucsoftsec@gmail.com>
+Resolves-bug: http://bugzilla.kernel.org/show_bug?44441
+Signed-off-by: Alan Cox <alan@linux.intel.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/net/caif/caif_serial.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/net/caif/caif_serial.c b/drivers/net/caif/caif_serial.c
+index 3df0c0f..82b1802 100644
+--- a/drivers/net/caif/caif_serial.c
++++ b/drivers/net/caif/caif_serial.c
+@@ -325,6 +325,9 @@ static int ldisc_open(struct tty_struct *tty)
+ 
+ 	sprintf(name, "cf%s", tty->name);
+ 	dev = alloc_netdev(sizeof(*ser), name, caifdev_setup);
++	if (!dev)
++		return -ENOMEM;
++
+ 	ser = netdev_priv(dev);
+ 	ser->tty = tty_kref_get(tty);
+ 	ser->dev = dev;
+-- 
+2.5.0
+

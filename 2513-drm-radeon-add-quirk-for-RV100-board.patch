@@ -1,0 +1,41 @@
+From dfd365b9521a33e63210824d31838b9c8b258d4a Mon Sep 17 00:00:00 2001
+From: Alex Deucher <alexander.deucher@amd.com>
+Date: Tue, 29 Jan 2013 16:36:47 -0500
+Subject: [PATCH 2513/3390] drm/radeon: add quirk for RV100 board
+
+commit 9200ee4941a6e5d1ec5df88982243686882dff3f upstream.
+
+vbios says external TMDS while the board is actually
+internal TMDS.
+
+fixes:
+https://bugs.freedesktop.org/show_bug.cgi?id=60037
+
+Signed-off-by: Alex Deucher <alexander.deucher@amd.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/gpu/drm/radeon/radeon_combios.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/drivers/gpu/drm/radeon/radeon_combios.c b/drivers/gpu/drm/radeon/radeon_combios.c
+index 859df6b..2157e77 100644
+--- a/drivers/gpu/drm/radeon/radeon_combios.c
++++ b/drivers/gpu/drm/radeon/radeon_combios.c
+@@ -2338,6 +2338,14 @@ bool radeon_get_legacy_connector_info_from_bios(struct drm_device *dev)
+ 								   1),
+ 								  ATOM_DEVICE_CRT1_SUPPORT);
+ 				}
++				/* RV100 board with external TDMS bit mis-set.
++				 * Actually uses internal TMDS, clear the bit.
++				 */
++				if (dev->pdev->device == 0x5159 &&
++				    dev->pdev->subsystem_vendor == 0x1014 &&
++				    dev->pdev->subsystem_device == 0x029A) {
++					tmp &= ~(1 << 4);
++				}
+ 				if ((tmp >> 4) & 0x1) {
+ 					devices |= ATOM_DEVICE_DFP2_SUPPORT;
+ 					radeon_add_legacy_encoder(dev,
+-- 
+2.5.0
+

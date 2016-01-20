@@ -1,0 +1,37 @@
+From 6176ebe5391aa20700f9348fa7f7aca1a559e78f Mon Sep 17 00:00:00 2001
+From: Bernd Schubert <bernd.schubert@itwm.fraunhofer.de>
+Date: Mon, 8 Aug 2011 17:38:08 +0200
+Subject: [PATCH 0090/3390] nfsd4: Remove check for a 32-bit cookie in
+ nfsd4_readdir()
+
+commit 832023bffb4b493f230be901f681020caf3ed1f8 upstream.
+
+Fan Yong <yong.fan@whamcloud.com> noticed setting
+FMODE_32bithash wouldn't work with nfsd v4, as
+nfsd4_readdir() checks for 32 bit cookies. However, according to RFC 3530
+cookies have a 64 bit type and cookies are also defined as u64 in
+'struct nfsd4_readdir'. So remove the test for >32-bit values.
+
+Signed-off-by: Bernd Schubert <bernd.schubert@itwm.fraunhofer.de>
+Signed-off-by: J. Bruce Fields <bfields@redhat.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ fs/nfsd/nfs4proc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fs/nfsd/nfs4proc.c b/fs/nfsd/nfs4proc.c
+index 3a6dbd7..f7799d3 100644
+--- a/fs/nfsd/nfs4proc.c
++++ b/fs/nfsd/nfs4proc.c
+@@ -682,7 +682,7 @@ nfsd4_readdir(struct svc_rqst *rqstp, struct nfsd4_compound_state *cstate,
+ 	readdir->rd_bmval[1] &= nfsd_suppattrs1(cstate->minorversion);
+ 	readdir->rd_bmval[2] &= nfsd_suppattrs2(cstate->minorversion);
+ 
+-	if ((cookie > ~(u32)0) || (cookie == 1) || (cookie == 2) ||
++	if ((cookie == 1) || (cookie == 2) ||
+ 	    (cookie == 0 && memcmp(readdir->rd_verf.data, zeroverf.data, NFS4_VERIFIER_SIZE)))
+ 		return nfserr_bad_cookie;
+ 
+-- 
+2.5.0
+

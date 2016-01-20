@@ -1,0 +1,43 @@
+From 0c5a975756c0c111294d728c683d083a9649b541 Mon Sep 17 00:00:00 2001
+From: Claudio Scordino <claudio@evidence.eu.com>
+Date: Thu, 8 Dec 2011 14:33:56 -0800
+Subject: [PATCH 0435/3390] fs/proc/meminfo.c: fix compilation error
+
+commit b53fc7c2974a50913f49e1d800fe904a28c338e3 upstream.
+
+Fix the error message "directives may not be used inside a macro argument"
+which appears when the kernel is compiled for the cris architecture.
+
+Signed-off-by: Claudio Scordino <claudio@evidence.eu.com>
+Cc: Andrea Arcangeli <aarcange@redhat.com>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ fs/proc/meminfo.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/fs/proc/meminfo.c b/fs/proc/meminfo.c
+index ed257d1..a962827 100644
+--- a/fs/proc/meminfo.c
++++ b/fs/proc/meminfo.c
+@@ -131,12 +131,13 @@ static int meminfo_proc_show(struct seq_file *m, void *v)
+ 		K(i.freeswap),
+ 		K(global_page_state(NR_FILE_DIRTY)),
+ 		K(global_page_state(NR_WRITEBACK)),
+-		K(global_page_state(NR_ANON_PAGES)
+ #ifdef CONFIG_TRANSPARENT_HUGEPAGE
++		K(global_page_state(NR_ANON_PAGES)
+ 		  + global_page_state(NR_ANON_TRANSPARENT_HUGEPAGES) *
+-		  HPAGE_PMD_NR
++		  HPAGE_PMD_NR),
++#else
++		K(global_page_state(NR_ANON_PAGES)),
+ #endif
+-		  ),
+ 		K(global_page_state(NR_FILE_MAPPED)),
+ 		K(global_page_state(NR_SHMEM)),
+ 		K(global_page_state(NR_SLAB_RECLAIMABLE) +
+-- 
+2.5.0
+

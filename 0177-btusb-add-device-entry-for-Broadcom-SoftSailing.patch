@@ -1,0 +1,36 @@
+From b710365a9a762cb6cf931a066648daf9a941a9af Mon Sep 17 00:00:00 2001
+From: Oliver Neukum <oneukum@suse.de>
+Date: Wed, 21 Sep 2011 11:41:45 +0200
+Subject: [PATCH 0177/3390] btusb: add device entry for Broadcom SoftSailing
+
+commit c510eae377c773241ff0b6369a8f3581da941a51 upstream.
+
+
+This device declares itself to be vendor specific
+It therefore needs to be added to the device table
+to make btusb bind.
+
+Signed-off-by: Oliver Neukum <oneukum@suse.de>
+Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ drivers/bluetooth/btusb.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index ffda6c8..b9af6db 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -60,6 +60,9 @@ static struct usb_device_id btusb_table[] = {
+ 	/* Generic Bluetooth USB device */
+ 	{ USB_DEVICE_INFO(0xe0, 0x01, 0x01) },
+ 
++	/* Broadcom SoftSailing reporting vendor specific */
++	{ USB_DEVICE(0x05ac, 0x21e1) },
++
+ 	/* Apple MacBookPro 7,1 */
+ 	{ USB_DEVICE(0x05ac, 0x8213) },
+ 
+-- 
+2.5.0
+

@@ -1,0 +1,35 @@
+From 78724db116c88705db2d6acbe66c56bed90fc991 Mon Sep 17 00:00:00 2001
+From: Jesper Juhl <jj@chaosbits.net>
+Date: Sun, 13 Nov 2011 22:14:32 +0100
+Subject: [PATCH 0297/3390] Net, libertas: Resolve memory leak in
+ if_spi_host_to_card()
+
+commit fe09b32a4361bea44169b2063e8c867cabb6a8ba upstream.
+
+If we hit the default case in the switch in if_spi_host_to_card() we'll leak
+the memory we allocated for 'packet'. This patch resolves the leak by freeing
+the allocated memory in that case.
+
+Signed-off-by: Jesper Juhl <jj@chaosbits.net>
+Acked-by: Dan Williams <dcbw@redhat.com>
+Signed-off-by: John W. Linville <linville@tuxdriver.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ drivers/net/wireless/libertas/if_spi.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/wireless/libertas/if_spi.c b/drivers/net/wireless/libertas/if_spi.c
+index 463352c..db39742 100644
+--- a/drivers/net/wireless/libertas/if_spi.c
++++ b/drivers/net/wireless/libertas/if_spi.c
+@@ -997,6 +997,7 @@ static int if_spi_host_to_card(struct lbs_private *priv,
+ 		spin_unlock_irqrestore(&card->buffer_lock, flags);
+ 		break;
+ 	default:
++		kfree(packet);
+ 		netdev_err(priv->dev, "can't transfer buffer of type %d\n",
+ 			   type);
+ 		err = -EINVAL;
+-- 
+2.5.0
+

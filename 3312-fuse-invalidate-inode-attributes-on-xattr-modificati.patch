@@ -1,0 +1,44 @@
+From 59e272211a96b1a4aee7ca1c328353f6c9b7e92e Mon Sep 17 00:00:00 2001
+From: Anand Avati <avati@redhat.com>
+Date: Tue, 20 Aug 2013 02:21:07 -0400
+Subject: [PATCH 3312/3390] fuse: invalidate inode attributes on xattr
+ modification
+
+commit d331a415aef98717393dda0be69b7947da08eba3 upstream.
+
+Calls like setxattr and removexattr result in updation of ctime.
+Therefore invalidate inode attributes to force a refresh.
+
+Signed-off-by: Anand Avati <avati@redhat.com>
+Reviewed-by: Brian Foster <bfoster@redhat.com>
+Signed-off-by: Miklos Szeredi <mszeredi@suse.cz>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ fs/fuse/dir.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/fs/fuse/dir.c b/fs/fuse/dir.c
+index c04a025..607a973 100644
+--- a/fs/fuse/dir.c
++++ b/fs/fuse/dir.c
+@@ -1439,6 +1439,8 @@ static int fuse_setxattr(struct dentry *entry, const char *name,
+ 		fc->no_setxattr = 1;
+ 		err = -EOPNOTSUPP;
+ 	}
++	if (!err)
++		fuse_invalidate_attr(inode);
+ 	return err;
+ }
+ 
+@@ -1568,6 +1570,8 @@ static int fuse_removexattr(struct dentry *entry, const char *name)
+ 		fc->no_removexattr = 1;
+ 		err = -EOPNOTSUPP;
+ 	}
++	if (!err)
++		fuse_invalidate_attr(inode);
+ 	return err;
+ }
+ 
+-- 
+2.5.0
+

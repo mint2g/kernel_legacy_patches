@@ -1,0 +1,30 @@
+From 6f3894d0531ec8aa8c111919af5f5d5c997d5106 Mon Sep 17 00:00:00 2001
+From: Ben Jencks <ben@bjencks.net>
+Date: Tue, 2 Apr 2013 00:35:08 -0400
+Subject: [PATCH 2911/3390] usb/misc/appledisplay: Add 24" LED Cinema display
+
+commit e7d3b6e22c871ba36d052ca99bc8ceca4d546a60 upstream.
+
+Add the Apple 24" LED Cinema display to the supported devices.
+
+Signed-off-by: Ben Jencks <ben@bjencks.net>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/usb/misc/appledisplay.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/usb/misc/appledisplay.c b/drivers/usb/misc/appledisplay.c
+index 68ab460..0a70c98 100644
+--- a/drivers/usb/misc/appledisplay.c
++++ b/drivers/usb/misc/appledisplay.c
+@@ -63,6 +63,7 @@ static const struct usb_device_id appledisplay_table[] = {
+ 	{ APPLEDISPLAY_DEVICE(0x9219) },
+ 	{ APPLEDISPLAY_DEVICE(0x921c) },
+ 	{ APPLEDISPLAY_DEVICE(0x921d) },
++	{ APPLEDISPLAY_DEVICE(0x9236) },
+ 
+ 	/* Terminating entry */
+ 	{ }
+-- 
+2.5.0
+

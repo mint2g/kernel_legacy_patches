@@ -1,0 +1,35 @@
+From c11deb8d898318a2fea9a291b16a7a2b2507cc94 Mon Sep 17 00:00:00 2001
+From: Eric Dumazet <eric.dumazet@gmail.com>
+Date: Fri, 7 Oct 2011 05:35:46 +0000
+Subject: [PATCH 0138/3390] l2tp: fix a potential skb leak in l2tp_xmit_skb()
+
+[ Upstream commit 835acf5da239b91edb9f7ebe36516999e156e6ee ]
+
+l2tp_xmit_skb() can leak one skb if skb_cow_head() returns an error.
+
+Signed-off-by: Eric Dumazet <eric.dumazet@gmail.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ net/l2tp/l2tp_core.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
+index ed8a233..71c292e 100644
+--- a/net/l2tp/l2tp_core.c
++++ b/net/l2tp/l2tp_core.c
+@@ -1045,8 +1045,10 @@ int l2tp_xmit_skb(struct l2tp_session *session, struct sk_buff *skb, int hdr_len
+ 	headroom = NET_SKB_PAD + sizeof(struct iphdr) +
+ 		uhlen + hdr_len;
+ 	old_headroom = skb_headroom(skb);
+-	if (skb_cow_head(skb, headroom))
++	if (skb_cow_head(skb, headroom)) {
++		dev_kfree_skb(skb);
+ 		goto abort;
++	}
+ 
+ 	new_headroom = skb_headroom(skb);
+ 	skb_orphan(skb);
+-- 
+2.5.0
+

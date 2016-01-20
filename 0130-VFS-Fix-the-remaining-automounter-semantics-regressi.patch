@@ -1,0 +1,70 @@
+From 6c36547293e6c46fe5df46e5e1b9ce9babb9eb37 Mon Sep 17 00:00:00 2001
+From: Trond Myklebust <Trond.Myklebust@netapp.com>
+Date: Tue, 25 Oct 2011 13:59:47 +0200
+Subject: [PATCH 0130/3390] VFS: Fix the remaining automounter semantics
+ regressions
+
+commit 815d405ceff0d6964683f033e18b9b23a88fba87 upstream.
+
+The concensus seems to be that system calls such as stat() etc should
+not trigger an automount.  Neither should the l* versions.
+
+This patch therefore adds a LOOKUP_AUTOMOUNT flag to tag those lookups
+that _should_ trigger an automount on the last path element.
+
+Signed-off-by: Trond Myklebust <Trond.Myklebust@netapp.com>
+[ Edited to leave out the cases that are already covered by LOOKUP_OPEN,
+  LOOKUP_DIRECTORY and LOOKUP_CREATE - all of which also fundamentally
+  force automounting for their own reasons   - Linus ]
+
+Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+Signed-off-by: Miklos Szeredi <mszeredi@suse.cz>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ fs/namespace.c   | 2 +-
+ fs/nfs/super.c   | 2 +-
+ fs/quota/quota.c | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/fs/namespace.c b/fs/namespace.c
+index 304a55d..537dd96 100644
+--- a/fs/namespace.c
++++ b/fs/namespace.c
+@@ -1758,7 +1758,7 @@ static int do_loopback(struct path *path, char *old_name,
+ 		return err;
+ 	if (!old_name || !*old_name)
+ 		return -EINVAL;
+-	err = kern_path(old_name, LOOKUP_FOLLOW, &old_path);
++	err = kern_path(old_name, LOOKUP_FOLLOW|LOOKUP_AUTOMOUNT, &old_path);
+ 	if (err)
+ 		return err;
+ 
+diff --git a/fs/nfs/super.c b/fs/nfs/super.c
+index ce40e5c..858d31b 100644
+--- a/fs/nfs/super.c
++++ b/fs/nfs/super.c
+@@ -2793,7 +2793,7 @@ static struct dentry *nfs_follow_remote_path(struct vfsmount *root_mnt,
+ 		goto out_put_mnt_ns;
+ 
+ 	ret = vfs_path_lookup(root_mnt->mnt_root, root_mnt,
+-			export_path, LOOKUP_FOLLOW, nd);
++			export_path, LOOKUP_FOLLOW|LOOKUP_AUTOMOUNT, nd);
+ 
+ 	nfs_referral_loop_unprotect();
+ 	put_mnt_ns(ns_private);
+diff --git a/fs/quota/quota.c b/fs/quota/quota.c
+index b34bdb2..10b6be3 100644
+--- a/fs/quota/quota.c
++++ b/fs/quota/quota.c
+@@ -355,7 +355,7 @@ SYSCALL_DEFINE4(quotactl, unsigned int, cmd, const char __user *, special,
+ 	 * resolution (think about autofs) and thus deadlocks could arise.
+ 	 */
+ 	if (cmds == Q_QUOTAON) {
+-		ret = user_path_at(AT_FDCWD, addr, LOOKUP_FOLLOW, &path);
++		ret = user_path_at(AT_FDCWD, addr, LOOKUP_FOLLOW|LOOKUP_AUTOMOUNT, &path);
+ 		if (ret)
+ 			pathp = ERR_PTR(ret);
+ 		else
+-- 
+2.5.0
+

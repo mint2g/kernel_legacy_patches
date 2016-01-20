@@ -1,0 +1,40 @@
+From b51aa5a05a594d19b900b23e54b401f453be2f90 Mon Sep 17 00:00:00 2001
+From: Anisse Astier <anisse@astier.eu>
+Date: Wed, 7 Mar 2012 18:36:35 +0100
+Subject: [PATCH 1138/3390] drm/i915: no-lvds quirk on MSI DC500
+
+commit 97effadb65ed08809e1720c8d3ee80b73a93665c upstream.
+
+This hardware doesn't have an LVDS, it's a desktop box. Fix incorrect
+LVDS detection.
+
+Signed-off-by: Anisse Astier <anisse@astier.eu>
+Acked-by: Chris Wilson <chris@chris-wilson.co.uk>
+Signed-off-by: Daniel Vetter <daniel.vetter@ffwll.ch>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/gpu/drm/i915/intel_lvds.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/drivers/gpu/drm/i915/intel_lvds.c b/drivers/gpu/drm/i915/intel_lvds.c
+index 21257f8..ff85a91 100644
+--- a/drivers/gpu/drm/i915/intel_lvds.c
++++ b/drivers/gpu/drm/i915/intel_lvds.c
+@@ -743,6 +743,14 @@ static const struct dmi_system_id intel_no_lvds[] = {
+ 			DMI_MATCH(DMI_PRODUCT_NAME, "EB1007"),
+ 		},
+ 	},
++	{
++		.callback = intel_no_lvds_dmi_callback,
++		.ident = "MSI Wind Box DC500",
++		.matches = {
++			DMI_MATCH(DMI_BOARD_VENDOR, "MICRO-STAR INTERNATIONAL CO., LTD"),
++			DMI_MATCH(DMI_BOARD_NAME, "MS-7469"),
++		},
++	},
+ 
+ 	{ }	/* terminating entry */
+ };
+-- 
+2.5.0
+

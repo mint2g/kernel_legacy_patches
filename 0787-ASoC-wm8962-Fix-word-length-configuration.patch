@@ -1,0 +1,38 @@
+From 2b42237845c6c1f94479320b012664bbf07bb989 Mon Sep 17 00:00:00 2001
+From: Susan Gao <sgao@opensource.wolfsonmicro.com>
+Date: Mon, 30 Jan 2012 13:57:04 -0800
+Subject: [PATCH 0787/3390] ASoC: wm8962: Fix word length configuration
+
+commit 2b6712b19531e22455e7fa18371c5ba9eec76699 upstream.
+
+Signed-off-by: Susan Gao <sgao@opensource.wolfsonmicro.com>
+Signed-off-by: Mark Brown <broonie@opensource.wolfsonmicro.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ sound/soc/codecs/wm8962.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/sound/soc/codecs/wm8962.c b/sound/soc/codecs/wm8962.c
+index 4a0f666..6d0cae4 100644
+--- a/sound/soc/codecs/wm8962.c
++++ b/sound/soc/codecs/wm8962.c
+@@ -2975,13 +2975,13 @@ static int wm8962_hw_params(struct snd_pcm_substream *substream,
+ 	case SNDRV_PCM_FORMAT_S16_LE:
+ 		break;
+ 	case SNDRV_PCM_FORMAT_S20_3LE:
+-		aif0 |= 0x40;
++		aif0 |= 0x4;
+ 		break;
+ 	case SNDRV_PCM_FORMAT_S24_LE:
+-		aif0 |= 0x80;
++		aif0 |= 0x8;
+ 		break;
+ 	case SNDRV_PCM_FORMAT_S32_LE:
+-		aif0 |= 0xc0;
++		aif0 |= 0xc;
+ 		break;
+ 	default:
+ 		return -EINVAL;
+-- 
+2.5.0
+

@@ -1,0 +1,45 @@
+From 8f5f4d275fd3b6cfd772b1d583f60c9d26818173 Mon Sep 17 00:00:00 2001
+From: David Henningsson <david.henningsson@canonical.com>
+Date: Thu, 20 Sep 2012 10:20:41 +0200
+Subject: [PATCH 2047/3390] ALSA: usb - disable broken hw volume for Tenx
+ TP6911
+
+commit c10514394ef9e8de93a4ad8c8904d71dcd82c122 upstream.
+
+While going through Ubuntu bugs, I discovered this patch being
+posted and a confirmation that the patch works as expected.
+
+Finding out how the hw volume really works would be preferrable
+to just disabling the broken one, but this would be better than
+nothing.
+
+Credit: sndfnsdfin (qawsnews)
+BugLink: https://bugs.launchpad.net/bugs/559939
+Signed-off-by: David Henningsson <david.henningsson@canonical.com>
+Signed-off-by: Takashi Iwai <tiwai@suse.de>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ sound/usb/mixer.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/sound/usb/mixer.c b/sound/usb/mixer.c
+index 0de7cbd..9363a8c 100644
+--- a/sound/usb/mixer.c
++++ b/sound/usb/mixer.c
+@@ -1246,6 +1246,13 @@ static int parse_audio_feature_unit(struct mixer_build *state, int unitid, void
+ 		/* disable non-functional volume control */
+ 		master_bits &= ~UAC_CONTROL_BIT(UAC_FU_VOLUME);
+ 		break;
++	case USB_ID(0x1130, 0xf211):
++		snd_printk(KERN_INFO
++			   "usbmixer: volume control quirk for Tenx TP6911 Audio Headset\n");
++		/* disable non-functional volume control */
++		channels = 0;
++		break;
++
+ 	}
+ 	if (channels > 0)
+ 		first_ch_bits = snd_usb_combine_bytes(bmaControls + csize, csize);
+-- 
+2.5.0
+

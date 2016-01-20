@@ -1,0 +1,52 @@
+From eb89536db55afc262a59e493a76b521c5c7ad89e Mon Sep 17 00:00:00 2001
+From: Greg Kroah-Hartman <gregkh@suse.de>
+Date: Tue, 29 Nov 2011 07:38:25 +0900
+Subject: [PATCH 0344/3390] Revert "USB: EHCI: fix HUB TT scheduling issue with
+ iso transfer"
+
+This reverts commit 317451c11fefcb0e05383f0a0080bb7f5445cfcf.
+
+Cc: Matthieu Castet <matthieu.castet@parrot.com>
+Cc: Thomas Poussevin <thomas.poussevin@parrot.com>
+Cc: Alan Stern <stern@rowland.harvard.edu>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ drivers/usb/host/ehci-sched.c | 15 +++++----------
+ 1 file changed, 5 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/usb/host/ehci-sched.c b/drivers/usb/host/ehci-sched.c
+index fb2d0c2..063c630 100644
+--- a/drivers/usb/host/ehci-sched.c
++++ b/drivers/usb/host/ehci-sched.c
+@@ -1483,15 +1483,10 @@ iso_stream_schedule (
+ 
+ 		/* NOTE:  assumes URB_ISO_ASAP, to limit complexity/bugs */
+ 
+-		/* find a uframe slot with enough bandwidth.
+-		 * Early uframes are more precious because full-speed
+-		 * iso IN transfers can't use late uframes,
+-		 * and therefore they should be allocated last.
+-		 */
+-		next = start;
+-		start += period;
+-		do {
+-			start--;
++		/* find a uframe slot with enough bandwidth */
++		next = start + period;
++		for (; start < next; start++) {
++
+ 			/* check schedule: enough space? */
+ 			if (stream->highspeed) {
+ 				if (itd_slot_ok(ehci, mod, start,
+@@ -1504,7 +1499,7 @@ iso_stream_schedule (
+ 						start, sched, period))
+ 					break;
+ 			}
+-		} while (start > next);
++		}
+ 
+ 		/* no room in the schedule */
+ 		if (start == next) {
+-- 
+2.5.0
+

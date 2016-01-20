@@ -1,0 +1,47 @@
+From 49432a001824f973ccf8214c7ef9e8e72c974987 Mon Sep 17 00:00:00 2001
+From: Oleg Nesterov <oleg@redhat.com>
+Date: Thu, 16 May 2013 17:43:55 +0200
+Subject: [PATCH 3000/3390] usermodehelper: check subprocess_info->path != NULL
+
+commit 264b83c07a84223f0efd0d1db9ccc66d6f88288f upstream.
+
+argv_split(empty_or_all_spaces) happily succeeds, it simply returns
+argc == 0 and argv[0] == NULL. Change call_usermodehelper_exec() to
+check sub_info->path != NULL to avoid the crash.
+
+This is the minimal fix, todo:
+
+ - perhaps we should change argv_split() to return NULL or change the
+   callers.
+
+ - kill or justify ->path[0] check
+
+ - narrow the scope of helper_lock()
+
+Signed-off-by: Oleg Nesterov <oleg@redhat.com>
+Acked-By: Lucas De Marchi <lucas.demarchi@intel.com>
+Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ kernel/kmod.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/kernel/kmod.c b/kernel/kmod.c
+index fabfe54..f625b4f 100644
+--- a/kernel/kmod.c
++++ b/kernel/kmod.c
+@@ -421,6 +421,11 @@ int call_usermodehelper_exec(struct subprocess_info *sub_info,
+ 	int retval = 0;
+ 
+ 	helper_lock();
++	if (!sub_info->path) {
++		retval = -EINVAL;
++		goto out;
++	}
++
+ 	if (sub_info->path[0] == '\0')
+ 		goto out;
+ 
+-- 
+2.5.0
+

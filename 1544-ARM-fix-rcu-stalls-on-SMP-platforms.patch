@@ -1,0 +1,80 @@
+From d1877392b4dce5d4c74d329777980d2a3ccede99 Mon Sep 17 00:00:00 2001
+From: Russell King <rmk+kernel@arm.linux.org.uk>
+Date: Thu, 19 Jan 2012 15:20:58 +0000
+Subject: [PATCH 1544/3390] ARM: fix rcu stalls on SMP platforms
+
+commit 7deabca0acfe02b8e18f59a4c95676012f49a304 upstream.
+
+We can stall RCU processing on SMP platforms if a CPU sits in its idle
+loop for a long time.  This happens because we don't call irq_enter()
+and irq_exit() around generic_smp_call_function_interrupt() and
+friends.  Add the necessary calls, and remove the one from within
+ipi_timer(), so that they're all in a common place.
+
+Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
+[add irq_enter()/irq_exit() in do_local_timer]
+Signed-off-by: UCHINO Satoshi <satoshi.uchino@toshiba.co.jp>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ arch/arm/kernel/smp.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/kernel/smp.c b/arch/arm/kernel/smp.c
+index fea97f6..4469924 100644
+--- a/arch/arm/kernel/smp.c
++++ b/arch/arm/kernel/smp.c
+@@ -445,9 +445,7 @@ static DEFINE_PER_CPU(struct clock_event_device, percpu_clockevent);
+ static void ipi_timer(void)
+ {
+ 	struct clock_event_device *evt = &__get_cpu_var(percpu_clockevent);
+-	irq_enter();
+ 	evt->event_handler(evt);
+-	irq_exit();
+ }
+ 
+ #ifdef CONFIG_LOCAL_TIMERS
+@@ -458,7 +456,9 @@ asmlinkage void __exception_irq_entry do_local_timer(struct pt_regs *regs)
+ 
+ 	if (local_timer_ack()) {
+ 		__inc_irq_stat(cpu, local_timer_irqs);
++		irq_enter();
+ 		ipi_timer();
++		irq_exit();
+ 	}
+ 
+ 	set_irq_regs(old_regs);
+@@ -568,7 +568,9 @@ asmlinkage void __exception_irq_entry do_IPI(int ipinr, struct pt_regs *regs)
+ 
+ 	switch (ipinr) {
+ 	case IPI_TIMER:
++		irq_enter();
+ 		ipi_timer();
++		irq_exit();
+ 		break;
+ 
+ 	case IPI_RESCHEDULE:
+@@ -576,15 +578,21 @@ asmlinkage void __exception_irq_entry do_IPI(int ipinr, struct pt_regs *regs)
+ 		break;
+ 
+ 	case IPI_CALL_FUNC:
++		irq_enter();
+ 		generic_smp_call_function_interrupt();
++		irq_exit();
+ 		break;
+ 
+ 	case IPI_CALL_FUNC_SINGLE:
++		irq_enter();
+ 		generic_smp_call_function_single_interrupt();
++		irq_exit();
+ 		break;
+ 
+ 	case IPI_CPU_STOP:
++		irq_enter();
+ 		ipi_cpu_stop(cpu);
++		irq_exit();
+ 		break;
+ 
+ 	default:
+-- 
+2.5.0
+

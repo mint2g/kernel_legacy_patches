@@ -1,0 +1,34 @@
+From 0a9cb8d371991dceed054aec71541653e330180f Mon Sep 17 00:00:00 2001
+From: Felix Fietkau <nbd@openwrt.org>
+Date: Sun, 7 Apr 2013 21:10:48 +0200
+Subject: [PATCH 2863/3390] ath9k_htc: accept 1.x firmware newer than 1.3
+
+commit 319e7bd96aca64a478f3aad40711c928405b8b77 upstream.
+
+Since the firmware has been open sourced, the minor version has been
+bumped to 1.4 and the API/ABI will stay compatible across further 1.x
+releases.
+
+Signed-off-by: Felix Fietkau <nbd@openwrt.org>
+Signed-off-by: John W. Linville <linville@tuxdriver.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/net/wireless/ath/ath9k/htc_drv_init.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/wireless/ath/ath9k/htc_drv_init.c b/drivers/net/wireless/ath/ath9k/htc_drv_init.c
+index 61e6d39..4099712 100644
+--- a/drivers/net/wireless/ath/ath9k/htc_drv_init.c
++++ b/drivers/net/wireless/ath/ath9k/htc_drv_init.c
+@@ -823,7 +823,7 @@ static int ath9k_init_firmware_version(struct ath9k_htc_priv *priv)
+ 	 * required version.
+ 	 */
+ 	if (priv->fw_version_major != MAJOR_VERSION_REQ ||
+-	    priv->fw_version_minor != MINOR_VERSION_REQ) {
++	    priv->fw_version_minor < MINOR_VERSION_REQ) {
+ 		dev_err(priv->dev, "ath9k_htc: Please upgrade to FW version %d.%d\n",
+ 			MAJOR_VERSION_REQ, MINOR_VERSION_REQ);
+ 		return -EINVAL;
+-- 
+2.5.0
+

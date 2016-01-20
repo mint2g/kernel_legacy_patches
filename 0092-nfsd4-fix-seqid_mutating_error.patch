@@ -1,0 +1,63 @@
+From e3d0b28c5ec3bf7628a9707a6392cdb4adebabba Mon Sep 17 00:00:00 2001
+From: "J. Bruce Fields" <bfields@redhat.com>
+Date: Wed, 10 Aug 2011 19:16:22 -0400
+Subject: [PATCH 0092/3390] nfsd4: fix seqid_mutating_error
+
+commit 576163005de286bbd418fcb99cfd0971523a0c6d upstream.
+
+The set of errors here does *not* agree with the set of errors specified
+in the rfc!
+
+While we're there, turn this macros into a function, for the usual
+reasons, and move it to the one place where it's actually used.
+
+Signed-off-by: J. Bruce Fields <bfields@redhat.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ fs/nfsd/nfs4xdr.c | 12 ++++++++++++
+ fs/nfsd/state.h   |  6 ------
+ 2 files changed, 12 insertions(+), 6 deletions(-)
+
+diff --git a/fs/nfsd/nfs4xdr.c b/fs/nfsd/nfs4xdr.c
+index 9901811..6c74097 100644
+--- a/fs/nfsd/nfs4xdr.c
++++ b/fs/nfsd/nfs4xdr.c
+@@ -1548,6 +1548,18 @@ static void write_cinfo(__be32 **p, struct nfsd4_change_info *c)
+ 								\
+ 	save = resp->p;
+ 
++static bool seqid_mutating_err(__be32 err)
++{
++	/* rfc 3530 section 8.1.5: */
++	return	err != nfserr_stale_clientid &&
++		err != nfserr_stale_stateid &&
++		err != nfserr_bad_stateid &&
++		err != nfserr_bad_seqid &&
++		err != nfserr_bad_xdr &&
++		err != nfserr_resource &&
++		err != nfserr_nofilehandle;
++}
++
+ /*
+  * Routine for encoding the result of a "seqid-mutating" NFSv4 operation.  This
+  * is where sequence id's are incremented, and the replay cache is filled.
+diff --git a/fs/nfsd/state.h b/fs/nfsd/state.h
+index 6bd2f3c..858c7ba 100644
+--- a/fs/nfsd/state.h
++++ b/fs/nfsd/state.h
+@@ -447,12 +447,6 @@ struct nfs4_stateid {
+ #define WR_STATE	        0x00000020
+ #define CLOSE_STATE             0x00000040
+ 
+-#define seqid_mutating_err(err)                       \
+-	(((err) != nfserr_stale_clientid) &&    \
+-	((err) != nfserr_bad_seqid) &&          \
+-	((err) != nfserr_stale_stateid) &&      \
+-	((err) != nfserr_bad_stateid))
+-
+ struct nfsd4_compound_state;
+ 
+ extern __be32 nfs4_preprocess_stateid_op(struct nfsd4_compound_state *cstate,
+-- 
+2.5.0
+

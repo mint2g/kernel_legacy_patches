@@ -1,0 +1,46 @@
+From 2c34b4ae8f8228e1ec083be0333426eca4a31357 Mon Sep 17 00:00:00 2001
+From: Chuck Lever <chuck.lever@oracle.com>
+Date: Tue, 19 Mar 2013 12:36:54 +0100
+Subject: [PATCH 2786/3390] NFS: nfs_getaclargs.acl_len is a size_t
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+commit 56d08fef2369d5ca9ad2e1fc697f5379fd8af751 upstream.
+
+Squelch compiler warnings:
+
+fs/nfs/nfs4proc.c: In function ‘__nfs4_get_acl_uncached’:
+fs/nfs/nfs4proc.c:3811:14: warning: comparison between signed and
+	unsigned integer expressions [-Wsign-compare]
+fs/nfs/nfs4proc.c:3818:15: warning: comparison between signed and
+	unsigned integer expressions [-Wsign-compare]
+
+Introduced by commit bf118a34 "NFSv4: include bitmap in nfsv4 get
+acl data", Dec 7, 2011.
+
+Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
+Signed-off-by: Trond Myklebust <Trond.Myklebust@netapp.com>
+Signed-off-by: Jiri Slaby <jslaby@suse.cz>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ fs/nfs/nfs4proc.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/fs/nfs/nfs4proc.c b/fs/nfs/nfs4proc.c
+index 50ec294..894e326 100644
+--- a/fs/nfs/nfs4proc.c
++++ b/fs/nfs/nfs4proc.c
+@@ -3563,7 +3563,8 @@ static ssize_t __nfs4_get_acl_uncached(struct inode *inode, void *buf, size_t bu
+ 		.rpc_argp = &args,
+ 		.rpc_resp = &res,
+ 	};
+-	int ret = -ENOMEM, npages, i, acl_len = 0;
++	int ret = -ENOMEM, npages, i;
++	size_t acl_len = 0;
+ 
+ 	npages = (buflen + PAGE_SIZE - 1) >> PAGE_SHIFT;
+ 	/* As long as we're doing a round trip to the server anyway,
+-- 
+2.5.0
+

@@ -1,0 +1,27 @@
+From 5dba9ddd98cbc7ad319d687887981a0ea0062c75 Mon Sep 17 00:00:00 2001
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Date: Tue, 22 Oct 2013 08:58:59 +0100
+Subject: [PATCH 3390/3390] Linux 3.0.101
+
+---
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index a6ddb9d..34880be 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,8 +1,8 @@
+ VERSION = 3
+ PATCHLEVEL = 0
+-SUBLEVEL = 100
++SUBLEVEL = 101
+ EXTRAVERSION =
+-NAME = Sneaky Weasel
++NAME = Sodden Ben Lomond
+ 
+ # *DOCUMENTATION*
+ # To see a list of typical targets execute "make help"
+-- 
+2.5.0
+

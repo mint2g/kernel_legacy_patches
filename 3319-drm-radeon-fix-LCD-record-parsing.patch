@@ -1,0 +1,36 @@
+From 3df0155c467f982d4c06078b74d042d7a5c2a743 Mon Sep 17 00:00:00 2001
+From: Alex Deucher <alexander.deucher@amd.com>
+Date: Tue, 20 Aug 2013 14:59:01 -0400
+Subject: [PATCH 3319/3390] drm/radeon: fix LCD record parsing
+
+commit 95663948ba22a4be8b99acd67fbf83e86ddffba4 upstream.
+
+If the LCD table contains an EDID record, properly account
+for the edid size when walking through the records.
+
+This should fix error messages about unknown LCD records.
+
+Signed-off-by: Alex Deucher <alexander.deucher@amd.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/gpu/drm/radeon/radeon_atombios.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/gpu/drm/radeon/radeon_atombios.c b/drivers/gpu/drm/radeon/radeon_atombios.c
+index b1aade0..4b2a7f0 100644
+--- a/drivers/gpu/drm/radeon/radeon_atombios.c
++++ b/drivers/gpu/drm/radeon/radeon_atombios.c
+@@ -1658,7 +1658,9 @@ struct radeon_encoder_atom_dig *radeon_atombios_get_lvds_info(struct
+ 								kfree(edid);
+ 						}
+ 					}
+-					record += sizeof(ATOM_FAKE_EDID_PATCH_RECORD);
++					record += fake_edid_record->ucFakeEDIDLength ?
++						fake_edid_record->ucFakeEDIDLength + 2 :
++						sizeof(ATOM_FAKE_EDID_PATCH_RECORD);
+ 					break;
+ 				case LCD_PANEL_RESOLUTION_RECORD_TYPE:
+ 					panel_res_record = (ATOM_PANEL_RESOLUTION_PATCH_RECORD *)record;
+-- 
+2.5.0
+

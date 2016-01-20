@@ -1,0 +1,40 @@
+From 7b59e3e29e1a28ad40892dd2115175e2702f1153 Mon Sep 17 00:00:00 2001
+From: Milan Broz <mbroz@redhat.com>
+Date: Mon, 22 Aug 2011 15:51:34 +0200
+Subject: [PATCH 0067/3390] kobj_uevent: Ignore if some listeners cannot handle
+ message
+
+commit ebf4127cd677e9781b450e44dfaaa1cc595efcaa upstream.
+
+kobject_uevent() uses a multicast socket and should ignore
+if one of listeners cannot handle messages or nobody is
+listening at all.
+
+Easily reproducible when a process in system is cloned
+with CLONE_NEWNET flag.
+
+(See also http://article.gmane.org/gmane.linux.kernel.device-mapper.dm-crypt/5256)
+
+Signed-off-by: Milan Broz <mbroz@redhat.com>
+Acked-by: Kay Sievers <kay.sievers@vrfy.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ lib/kobject_uevent.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/kobject_uevent.c b/lib/kobject_uevent.c
+index 70af0a7..ad72a03 100644
+--- a/lib/kobject_uevent.c
++++ b/lib/kobject_uevent.c
+@@ -282,7 +282,7 @@ int kobject_uevent_env(struct kobject *kobj, enum kobject_action action,
+ 							    kobj_bcast_filter,
+ 							    kobj);
+ 			/* ENOBUFS should be handled in userspace */
+-			if (retval == -ENOBUFS)
++			if (retval == -ENOBUFS || retval == -ESRCH)
+ 				retval = 0;
+ 		} else
+ 			retval = -ENOMEM;
+-- 
+2.5.0
+

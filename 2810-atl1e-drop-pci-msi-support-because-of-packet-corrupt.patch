@@ -1,0 +1,83 @@
+From be409987531f89307e1cb281ff104209a085a5d7 Mon Sep 17 00:00:00 2001
+From: Mugunthan V N <mugunthanvnm@ti.com>
+Date: Thu, 28 Mar 2013 18:10:50 +0000
+Subject: [PATCH 2810/3390] atl1e: drop pci-msi support because of packet
+ corruption
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+[ Upstream commit 188ab1b105c96656f6bcfb49d0d8bb1b1936b632 ]
+
+Usage of pci-msi results in corrupted dma packet transfers to the host.
+
+Reported-by: rebelyouth <rebelyouth.hacklab@gmail.com>
+Cc: Huang, Xiong <xiong@qca.qualcomm.com>
+Tested-by: Christian Sünkenberg <christian.suenkenberg@student.kit.edu>
+Signed-off-by: Hannes Frederic Sowa <hannes@stressinduktion.org>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/net/atl1e/atl1e.h      |  1 -
+ drivers/net/atl1e/atl1e_main.c | 22 ++--------------------
+ 2 files changed, 2 insertions(+), 21 deletions(-)
+
+diff --git a/drivers/net/atl1e/atl1e.h b/drivers/net/atl1e/atl1e.h
+index 490d3b3..4093097 100644
+--- a/drivers/net/atl1e/atl1e.h
++++ b/drivers/net/atl1e/atl1e.h
+@@ -439,7 +439,6 @@ struct atl1e_adapter {
+ 	struct atl1e_hw        hw;
+ 	struct atl1e_hw_stats  hw_stats;
+ 
+-	bool have_msi;
+ 	u32 wol;
+ 	u16 link_speed;
+ 	u16 link_duplex;
+diff --git a/drivers/net/atl1e/atl1e_main.c b/drivers/net/atl1e/atl1e_main.c
+index 86a9122..b0132bb 100644
+--- a/drivers/net/atl1e/atl1e_main.c
++++ b/drivers/net/atl1e/atl1e_main.c
+@@ -1848,37 +1848,19 @@ static void atl1e_free_irq(struct atl1e_adapter *adapter)
+ 	struct net_device *netdev = adapter->netdev;
+ 
+ 	free_irq(adapter->pdev->irq, netdev);
+-
+-	if (adapter->have_msi)
+-		pci_disable_msi(adapter->pdev);
+ }
+ 
+ static int atl1e_request_irq(struct atl1e_adapter *adapter)
+ {
+ 	struct pci_dev    *pdev   = adapter->pdev;
+ 	struct net_device *netdev = adapter->netdev;
+-	int flags = 0;
+ 	int err = 0;
+ 
+-	adapter->have_msi = true;
+-	err = pci_enable_msi(adapter->pdev);
+-	if (err) {
+-		netdev_dbg(adapter->netdev,
+-			   "Unable to allocate MSI interrupt Error: %d\n", err);
+-		adapter->have_msi = false;
+-	} else
+-		netdev->irq = pdev->irq;
+-
+-
+-	if (!adapter->have_msi)
+-		flags |= IRQF_SHARED;
+-	err = request_irq(adapter->pdev->irq, atl1e_intr, flags,
+-			netdev->name, netdev);
++	err = request_irq(pdev->irq, atl1e_intr, IRQF_SHARED,
++			  netdev->name, netdev);
+ 	if (err) {
+ 		netdev_dbg(adapter->netdev,
+ 			   "Unable to allocate interrupt Error: %d\n", err);
+-		if (adapter->have_msi)
+-			pci_disable_msi(adapter->pdev);
+ 		return err;
+ 	}
+ 	netdev_dbg(adapter->netdev, "atl1e_request_irq OK\n");
+-- 
+2.5.0
+

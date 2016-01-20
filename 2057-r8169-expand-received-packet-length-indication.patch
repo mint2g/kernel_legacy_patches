@@ -1,0 +1,39 @@
+From 11bd9becc350ab8adbb7f749c10536741d617d8a Mon Sep 17 00:00:00 2001
+From: Francois Romieu <romieu@fr.zoreil.com>
+Date: Fri, 5 Oct 2012 23:29:12 +0200
+Subject: [PATCH 2057/3390] r8169: expand received packet length indication.
+
+commit deb9d93c89d311714a60809b28160e538e1cbb43 upstream.
+
+8168d and above allow jumbo frames beyond 8k. Bump the received
+packet length check before enabling jumbo frames on these chipsets.
+
+Frame length indication covers bits 0..13 of the first Rx descriptor
+32 bits for the 8169 and 8168. I only have authoritative documentation
+for the allowed use of the extra (13) bit with the 8169 and 8168c.
+Realtek's drivers use the same mask for the 816x and the fast ethernet
+only 810x.
+
+Signed-off-by: Francois Romieu <romieu@fr.zoreil.com>
+Acked-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/net/r8169.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/r8169.c b/drivers/net/r8169.c
+index 0d34b38..3fe4fd3 100644
+--- a/drivers/net/r8169.c
++++ b/drivers/net/r8169.c
+@@ -5137,7 +5137,7 @@ static int rtl8169_rx_interrupt(struct net_device *dev,
+ 		} else {
+ 			struct sk_buff *skb;
+ 			dma_addr_t addr = le64_to_cpu(desc->addr);
+-			int pkt_size = (status & 0x00001FFF) - 4;
++			int pkt_size = (status & 0x00003fff) - 4;
+ 
+ 			/*
+ 			 * The driver does not support incoming fragmented
+-- 
+2.5.0
+

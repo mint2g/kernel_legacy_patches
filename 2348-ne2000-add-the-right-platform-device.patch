@@ -1,0 +1,32 @@
+From 80fef291d6f5d9f6f20e8c54cbc6ecbf47b187df Mon Sep 17 00:00:00 2001
+From: Alan Cox <alan@linux.intel.com>
+Date: Tue, 20 Nov 2012 06:31:57 +0000
+Subject: [PATCH 2348/3390] ne2000: add the right platform device
+
+[ Upstream commit da9da01d9199b5bb15289d0859053c9aa3a34ac0 ]
+
+Without this udev doesn't have a way to key the ne device to the platform
+device.
+
+Signed-off-by: Alan Cox <alan@linux.intel.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/net/ne.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/ne.c b/drivers/net/ne.c
+index 1063093..e8ee2bc 100644
+--- a/drivers/net/ne.c
++++ b/drivers/net/ne.c
+@@ -814,6 +814,7 @@ static int __init ne_drv_probe(struct platform_device *pdev)
+ 		dev->irq = irq[this_dev];
+ 		dev->mem_end = bad[this_dev];
+ 	}
++	SET_NETDEV_DEV(dev, &pdev->dev);
+ 	err = do_ne_probe(dev);
+ 	if (err) {
+ 		free_netdev(dev);
+-- 
+2.5.0
+

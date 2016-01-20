@@ -1,0 +1,39 @@
+From ebcd3f67c004ee5c51a9379d744e5546be73f227 Mon Sep 17 00:00:00 2001
+From: Trond Myklebust <Trond.Myklebust@netapp.com>
+Date: Mon, 1 Apr 2013 15:34:05 -0400
+Subject: [PATCH 2942/3390] NFSv4: Handle NFS4ERR_DELAY and NFS4ERR_GRACE in
+ nfs4_open_delegation_recall
+
+commit 8b6cc4d6f841d31f72fe7478453759166d366274 upstream.
+
+A server shouldn't normally return NFS4ERR_GRACE if the client holds a
+delegation, since no conflicting lock reclaims can be granted, however
+the spec does not require the server to grant the open in this
+instance
+
+Signed-off-by: Trond Myklebust <Trond.Myklebust@netapp.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ fs/nfs/nfs4proc.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/fs/nfs/nfs4proc.c b/fs/nfs/nfs4proc.c
+index 894e326..7204bcc 100644
+--- a/fs/nfs/nfs4proc.c
++++ b/fs/nfs/nfs4proc.c
+@@ -1335,6 +1335,12 @@ int nfs4_open_delegation_recall(struct nfs_open_context *ctx, struct nfs4_state
+ 			case -ENOMEM:
+ 				err = 0;
+ 				goto out;
++			case -NFS4ERR_DELAY:
++			case -NFS4ERR_GRACE:
++				set_bit(NFS_DELEGATED_STATE, &state->flags);
++				ssleep(1);
++				err = -EAGAIN;
++				goto out;
+ 		}
+ 		err = nfs4_handle_exception(server, err, &exception);
+ 	} while (exception.retry);
+-- 
+2.5.0
+

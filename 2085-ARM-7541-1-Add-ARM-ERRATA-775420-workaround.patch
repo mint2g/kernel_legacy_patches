@@ -1,0 +1,66 @@
+From 5c025e811fe6514200f7adf94e1861a56f73eb6b Mon Sep 17 00:00:00 2001
+From: Simon Horman <horms@verge.net.au>
+Date: Fri, 28 Sep 2012 02:12:45 +0100
+Subject: [PATCH 2085/3390] ARM: 7541/1: Add ARM ERRATA 775420 workaround
+
+commit 7253b85cc62d6ff84143d96fe6cd54f73736f4d7 upstream.
+
+arm: Add ARM ERRATA 775420 workaround
+
+Workaround for the 775420 Cortex-A9 (r2p2, r2p6,r2p8,r2p10,r3p0) erratum.
+In case a date cache maintenance operation aborts with MMU exception, it
+might cause the processor to deadlock. This workaround puts DSB before
+executing ISB if an abort may occur on cache maintenance.
+
+Based on work by Kouei Abe and feedback from Catalin Marinas.
+
+Signed-off-by: Kouei Abe <kouei.abe.cp@rms.renesas.com>
+[ horms@verge.net.au: Changed to implementation
+  suggested by catalin.marinas@arm.com ]
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Signed-off-by: Simon Horman <horms@verge.net.au>
+Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ arch/arm/Kconfig       | 10 ++++++++++
+ arch/arm/mm/cache-v7.S |  3 +++
+ 2 files changed, 13 insertions(+)
+
+diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
+index 157781e..17d179c 100644
+--- a/arch/arm/Kconfig
++++ b/arch/arm/Kconfig
+@@ -1260,6 +1260,16 @@ config PL310_ERRATA_769419
+ 	  on systems with an outer cache, the store buffer is drained
+ 	  explicitly.
+ 
++config ARM_ERRATA_775420
++       bool "ARM errata: A data cache maintenance operation which aborts, might lead to deadlock"
++       depends on CPU_V7
++       help
++	 This option enables the workaround for the 775420 Cortex-A9 (r2p2,
++	 r2p6,r2p8,r2p10,r3p0) erratum. In case a date cache maintenance
++	 operation aborts with MMU exception, it might cause the processor
++	 to deadlock. This workaround puts DSB before executing ISB if
++	 an abort may occur on cache maintenance.
++
+ endmenu
+ 
+ source "arch/arm/common/Kconfig"
+diff --git a/arch/arm/mm/cache-v7.S b/arch/arm/mm/cache-v7.S
+index 1ed1fd3..428b243 100644
+--- a/arch/arm/mm/cache-v7.S
++++ b/arch/arm/mm/cache-v7.S
+@@ -211,6 +211,9 @@ ENTRY(v7_coherent_user_range)
+  * isn't mapped, just try the next page.
+  */
+ 9001:
++#ifdef CONFIG_ARM_ERRATA_775420
++	dsb
++#endif
+ 	mov	r12, r12, lsr #12
+ 	mov	r12, r12, lsl #12
+ 	add	r12, r12, #4096
+-- 
+2.5.0
+

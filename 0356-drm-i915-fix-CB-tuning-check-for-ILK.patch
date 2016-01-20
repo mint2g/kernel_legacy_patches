@@ -1,0 +1,38 @@
+From ed3035ddf88840f6e8355281e74b2b0bb9c93da0 Mon Sep 17 00:00:00 2001
+From: Jesse Barnes <jbarnes@virtuousgeek.org>
+Date: Thu, 28 Jul 2011 14:50:30 -0700
+Subject: [PATCH 0356/3390] drm/i915: fix CB tuning check for ILK+
+
+commit cb0e093162d7b6589c2217a00e2abfef686b32d6 upstream.
+
+CB tuning is needed to handle potential process variations that might
+cause clock jitter for certain PLL settings.  However, we were setting
+it incorrectly since we were using the wrong M value as a check (M1 when
+we needed to use the whole M value).  Fix it up, making my HDMI
+attached display a little prettier (used to have occasional dots crawl
+across the display).
+
+Signed-off-by: Jesse Barnes <jbarnes@virtuousgeek.org>
+Signed-off-by: Keith Packard <keithp@keithp.com>
+Signed-off-by: Timo Aaltonen <timo@canonical.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ drivers/gpu/drm/i915/intel_display.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/gpu/drm/i915/intel_display.c b/drivers/gpu/drm/i915/intel_display.c
+index 3976909..fed87d6 100644
+--- a/drivers/gpu/drm/i915/intel_display.c
++++ b/drivers/gpu/drm/i915/intel_display.c
+@@ -4972,7 +4972,7 @@ static int ironlake_crtc_mode_set(struct drm_crtc *crtc,
+ 	} else if (is_sdvo && is_tv)
+ 		factor = 20;
+ 
+-	if (clock.m1 < factor * clock.n)
++	if (clock.m < factor * clock.n)
+ 		fp |= FP_CB_TUNE;
+ 
+ 	dpll = 0;
+-- 
+2.5.0
+

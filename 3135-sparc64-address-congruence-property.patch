@@ -1,0 +1,42 @@
+From b37c61632db280b4e831dc2431a73ca045bc7e42 Mon Sep 17 00:00:00 2001
+From: bob picco <bpicco@meloft.net>
+Date: Tue, 11 Jun 2013 14:54:51 -0400
+Subject: [PATCH 3135/3390] sparc64 address-congruence property
+
+Upstream commit 771a37ff4d80b80db3b0df3e7696f14b298c67b7
+
+The Machine Description (MD) property "address-congruence-offset" is
+optional. According to the MD specification the value is assumed 0UL when
+not present. This caused early boot failure on T5.
+
+Signed-off-by: Bob Picco <bob.picco@oracle.com>
+CC: sparclinux@vger.kernel.org
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ arch/sparc/mm/init_64.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/arch/sparc/mm/init_64.c b/arch/sparc/mm/init_64.c
+index 6ff4d78..b4989f9 100644
+--- a/arch/sparc/mm/init_64.c
++++ b/arch/sparc/mm/init_64.c
+@@ -1071,7 +1071,14 @@ static int __init grab_mblocks(struct mdesc_handle *md)
+ 		m->size = *val;
+ 		val = mdesc_get_property(md, node,
+ 					 "address-congruence-offset", NULL);
+-		m->offset = *val;
++
++		/* The address-congruence-offset property is optional.
++		 * Explicity zero it be identifty this.
++		 */
++		if (val)
++			m->offset = *val;
++		else
++			m->offset = 0UL;
+ 
+ 		numadbg("MBLOCK[%d]: base[%llx] size[%llx] offset[%llx]\n",
+ 			count - 1, m->base, m->size, m->offset);
+-- 
+2.5.0
+

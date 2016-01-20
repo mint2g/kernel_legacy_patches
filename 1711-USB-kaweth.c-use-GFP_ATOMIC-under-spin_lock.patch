@@ -1,0 +1,40 @@
+From 242e0e14c3995231230b2836bcd1f5dc6c08ff90 Mon Sep 17 00:00:00 2001
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Date: Fri, 27 Jul 2012 01:46:51 +0000
+Subject: [PATCH 1711/3390] USB: kaweth.c: use GFP_ATOMIC under spin_lock
+
+[ Upstream commit e4c7f259c5be99dcfc3d98f913590663b0305bf8 ]
+
+The problem is that we call this with a spin lock held.  The call tree
+is:
+	kaweth_start_xmit() holds kaweth->device_lock.
+	-> kaweth_async_set_rx_mode()
+	   -> kaweth_control()
+	      -> kaweth_internal_control_msg()
+
+The kaweth_internal_control_msg() function is only called from
+kaweth_control() which used GFP_ATOMIC for its allocations.
+
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/net/usb/kaweth.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/usb/kaweth.c b/drivers/net/usb/kaweth.c
+index ad0298f..3362449 100644
+--- a/drivers/net/usb/kaweth.c
++++ b/drivers/net/usb/kaweth.c
+@@ -1308,7 +1308,7 @@ static int kaweth_internal_control_msg(struct usb_device *usb_dev,
+         int retv;
+         int length = 0; /* shut up GCC */
+ 
+-        urb = usb_alloc_urb(0, GFP_NOIO);
++	urb = usb_alloc_urb(0, GFP_ATOMIC);
+         if (!urb)
+                 return -ENOMEM;
+ 
+-- 
+2.5.0
+

@@ -1,0 +1,60 @@
+From da2b1b750acd667cdd23bfd129a5b042e8b49988 Mon Sep 17 00:00:00 2001
+From: Francois Romieu <romieu@fr.zoreil.com>
+Date: Fri, 5 Oct 2012 23:29:10 +0200
+Subject: [PATCH 2055/3390] r8169: remove erroneous processing of always set
+ bit.
+
+commit e03f33af79f0772156e1a1a1e36bdddf8012b2e4 upstream.
+
+When set, RxFOVF (resp. RxBOVF) is always 1 (resp. 0).
+
+Signed-off-by: Francois Romieu <romieu@fr.zoreil.com>
+Cc: Hayes <hayeswang@realtek.com>
+Acked-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/net/r8169.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/r8169.c b/drivers/net/r8169.c
+index fa63283..786334e 100644
+--- a/drivers/net/r8169.c
++++ b/drivers/net/r8169.c
+@@ -388,6 +388,7 @@ enum rtl_register_content {
+ 	RxOK		= 0x0001,
+ 
+ 	/* RxStatusDesc */
++	RxBOVF	= (1 << 24),
+ 	RxFOVF	= (1 << 23),
+ 	RxRWT	= (1 << 22),
+ 	RxRES	= (1 << 21),
+@@ -666,6 +667,7 @@ struct rtl8169_private {
+ 	struct mii_if_info mii;
+ 	struct rtl8169_counters counters;
+ 	u32 saved_wolopts;
++	u32 opts1_mask;
+ 
+ 	const struct firmware *fw;
+ #define RTL_FIRMWARE_UNKNOWN	ERR_PTR(-EAGAIN);
+@@ -3442,6 +3444,9 @@ rtl8169_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	tp->intr_event = cfg->intr_event;
+ 	tp->napi_event = cfg->napi_event;
+ 
++	tp->opts1_mask = (tp->mac_version != RTL_GIGA_MAC_VER_01) ?
++		~(RxBOVF | RxFOVF) : ~0;
++
+ 	init_timer(&tp->timer);
+ 	tp->timer.data = (unsigned long) dev;
+ 	tp->timer.function = rtl8169_phy_timer;
+@@ -4920,7 +4925,7 @@ static int rtl8169_rx_interrupt(struct net_device *dev,
+ 		u32 status;
+ 
+ 		rmb();
+-		status = le32_to_cpu(desc->opts1);
++		status = le32_to_cpu(desc->opts1) & tp->opts1_mask;
+ 
+ 		if (status & DescOwn)
+ 			break;
+-- 
+2.5.0
+

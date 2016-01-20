@@ -1,0 +1,24 @@
+From 61bfa77de71ef9d84614d3a7f0a3ca1c7af82058 Mon Sep 17 00:00:00 2001
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Date: Sun, 21 Jul 2013 18:15:05 -0700
+Subject: [PATCH 3124/3390] Linux 3.0.87
+
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index da6a0ca..03aa17e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,6 +1,6 @@
+ VERSION = 3
+ PATCHLEVEL = 0
+-SUBLEVEL = 86
++SUBLEVEL = 87
+ EXTRAVERSION =
+ NAME = Sneaky Weasel
+ 
+-- 
+2.5.0
+

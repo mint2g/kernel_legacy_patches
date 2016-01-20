@@ -1,0 +1,34 @@
+From eaaa6acce02fa975e3d67fd223132e60da31207d Mon Sep 17 00:00:00 2001
+From: "David S. Miller" <davem@davemloft.net>
+Date: Tue, 30 Jul 2013 00:16:21 -0700
+Subject: [PATCH 3215/3390] net_sched: Fix stack info leak in cbq_dump_wrr().
+
+[ Upstream commit a0db856a95a29efb1c23db55c02d9f0ff4f0db48 ]
+
+Make sure the reserved fields, and padding (if any), are
+fully initialized.
+
+Based upon a patch by Dan Carpenter and feedback from
+Joe Perches.
+
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ net/sched/sch_cbq.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/net/sched/sch_cbq.c b/net/sched/sch_cbq.c
+index b7cddb9..7f59944 100644
+--- a/net/sched/sch_cbq.c
++++ b/net/sched/sch_cbq.c
+@@ -1467,6 +1467,7 @@ static int cbq_dump_wrr(struct sk_buff *skb, struct cbq_class *cl)
+ 	unsigned char *b = skb_tail_pointer(skb);
+ 	struct tc_cbq_wrropt opt;
+ 
++	memset(&opt, 0, sizeof(opt));
+ 	opt.flags = 0;
+ 	opt.allot = cl->allot;
+ 	opt.priority = cl->priority + 1;
+-- 
+2.5.0
+

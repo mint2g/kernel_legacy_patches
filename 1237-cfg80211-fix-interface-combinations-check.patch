@@ -1,0 +1,30 @@
+From 027e5d441e6a46ab6cfd5f0e27c5eebd533b8131 Mon Sep 17 00:00:00 2001
+From: Lukasz Kucharczyk <lukasz.kucharczyk@tieto.com>
+Date: Wed, 11 Apr 2012 14:55:10 +0200
+Subject: [PATCH 1237/3390] cfg80211: fix interface combinations check.
+
+commit e55a4046dab28c440c96890bdddcf02dc8981f2d upstream.
+
+Signed-off-by: Lukasz Kucharczyk <lukasz.kucharczyk@tieto.com>
+Signed-off-by: John W. Linville <linville@tuxdriver.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ net/wireless/util.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/wireless/util.c b/net/wireless/util.c
+index 4d7b83f..9c22330 100644
+--- a/net/wireless/util.c
++++ b/net/wireless/util.c
+@@ -990,7 +990,7 @@ int cfg80211_can_change_interface(struct cfg80211_registered_device *rdev,
+ 			if (rdev->wiphy.software_iftypes & BIT(iftype))
+ 				continue;
+ 			for (j = 0; j < c->n_limits; j++) {
+-				if (!(limits[j].types & iftype))
++				if (!(limits[j].types & BIT(iftype)))
+ 					continue;
+ 				if (limits[j].max < num[iftype])
+ 					goto cont;
+-- 
+2.5.0
+

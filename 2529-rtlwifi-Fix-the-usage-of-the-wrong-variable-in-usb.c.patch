@@ -1,0 +1,38 @@
+From ff3c8fd1344ae949c8acd35da44da25f10c48efd Mon Sep 17 00:00:00 2001
+From: Larry Finger <Larry.Finger@lwfinger.net>
+Date: Sun, 27 Jan 2013 16:24:25 -0600
+Subject: [PATCH 2529/3390] rtlwifi: Fix the usage of the wrong variable in
+ usb.c
+
+commit 0a06ad8e3a1cb5311b7dbafde45410aa1bce9d40 upstream.
+
+In routine _rtl_rx_pre_process(), skb_dequeue() is called to get an skb;
+however, the wrong variable name is used in subsequent calls.
+
+Reported-by: Guenter Roeck <linux@roeck-us.net>
+Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
+Cc: Guenter Roeck <linux@roeck-us.net>
+Signed-off-by: John W. Linville <linville@tuxdriver.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/net/wireless/rtlwifi/usb.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/wireless/rtlwifi/usb.c b/drivers/net/wireless/rtlwifi/usb.c
+index e4272b9..dbcf5a9 100644
+--- a/drivers/net/wireless/rtlwifi/usb.c
++++ b/drivers/net/wireless/rtlwifi/usb.c
+@@ -542,8 +542,8 @@ static void _rtl_rx_pre_process(struct ieee80211_hw *hw, struct sk_buff *skb)
+ 	WARN_ON(skb_queue_empty(&rx_queue));
+ 	while (!skb_queue_empty(&rx_queue)) {
+ 		_skb = skb_dequeue(&rx_queue);
+-		_rtl_usb_rx_process_agg(hw, skb);
+-		ieee80211_rx_irqsafe(hw, skb);
++		_rtl_usb_rx_process_agg(hw, _skb);
++		ieee80211_rx_irqsafe(hw, _skb);
+ 	}
+ }
+ 
+-- 
+2.5.0
+

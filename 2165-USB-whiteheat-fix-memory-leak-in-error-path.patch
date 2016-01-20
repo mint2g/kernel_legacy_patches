@@ -1,0 +1,31 @@
+From a48db008e3d875c6cd33f3d3aa86344e80bab16c Mon Sep 17 00:00:00 2001
+From: Johan Hovold <jhovold@gmail.com>
+Date: Thu, 25 Oct 2012 10:29:01 +0200
+Subject: [PATCH 2165/3390] USB: whiteheat: fix memory leak in error path
+
+commit c129197c99550d356cf5f69b046994dd53cd1b9d upstream.
+
+Make sure command buffer is deallocated in case of errors during attach.
+
+Signed-off-by: Johan Hovold <jhovold@gmail.com>
+Cc: <support@connecttech.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/usb/serial/whiteheat.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/usb/serial/whiteheat.c b/drivers/usb/serial/whiteheat.c
+index 5b073bc..59d646d 100644
+--- a/drivers/usb/serial/whiteheat.c
++++ b/drivers/usb/serial/whiteheat.c
+@@ -576,6 +576,7 @@ no_firmware:
+ 		"%s: please contact support@connecttech.com\n",
+ 		serial->type->description);
+ 	kfree(result);
++	kfree(command);
+ 	return -ENODEV;
+ 
+ no_command_private:
+-- 
+2.5.0
+

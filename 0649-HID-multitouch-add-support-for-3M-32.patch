@@ -1,0 +1,45 @@
+From 277a05f83af8c82291cf5f2ad0c2dd1aa6f29de7 Mon Sep 17 00:00:00 2001
+From: Benjamin Tissoires <benjamin.tissoires@gmail.com>
+Date: Fri, 23 Dec 2011 15:41:00 +0100
+Subject: [PATCH 0649/3390] HID: multitouch: add support for 3M 32"
+
+commit c4fad877cd0efb51d8180ae2eaa791c99c92051c upstream.
+
+Signed-off-by: Benjamin Tissoires <benjamin.tissoires@gmail.com>
+Acked-by: Henrik Rydberg <rydberg@euromail.se>
+Signed-off-by: Jiri Kosina <jkosina@suse.cz>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ drivers/hid/hid-ids.h        | 1 +
+ drivers/hid/hid-multitouch.c | 3 +++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/drivers/hid/hid-ids.h b/drivers/hid/hid-ids.h
+index 92d4f07..e0a28ad 100644
+--- a/drivers/hid/hid-ids.h
++++ b/drivers/hid/hid-ids.h
+@@ -21,6 +21,7 @@
+ #define USB_VENDOR_ID_3M		0x0596
+ #define USB_DEVICE_ID_3M1968		0x0500
+ #define USB_DEVICE_ID_3M2256		0x0502
++#define USB_DEVICE_ID_3M3266		0x0506
+ 
+ #define USB_VENDOR_ID_A4TECH		0x09da
+ #define USB_DEVICE_ID_A4TECH_WCP32PU	0x0006
+diff --git a/drivers/hid/hid-multitouch.c b/drivers/hid/hid-multitouch.c
+index c78350e..1308703 100644
+--- a/drivers/hid/hid-multitouch.c
++++ b/drivers/hid/hid-multitouch.c
+@@ -593,6 +593,9 @@ static const struct hid_device_id mt_devices[] = {
+ 	{ .driver_data = MT_CLS_3M,
+ 		HID_USB_DEVICE(USB_VENDOR_ID_3M,
+ 			USB_DEVICE_ID_3M2256) },
++	{ .driver_data = MT_CLS_3M,
++		HID_USB_DEVICE(USB_VENDOR_ID_3M,
++			USB_DEVICE_ID_3M3266) },
+ 
+ 	/* ActionStar panels */
+ 	{ .driver_data = MT_CLS_DEFAULT,
+-- 
+2.5.0
+

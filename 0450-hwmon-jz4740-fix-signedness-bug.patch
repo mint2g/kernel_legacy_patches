@@ -1,0 +1,34 @@
+From cadacbdef368bb32b8da3e9b46fc2a4b2ba751c7 Mon Sep 17 00:00:00 2001
+From: Axel Lin <axel.lin@gmail.com>
+Date: Thu, 8 Dec 2011 08:04:12 -0500
+Subject: [PATCH 0450/3390] hwmon: (jz4740) fix signedness bug
+
+commit 0b57d7602b68f7b2786b2f0e22da39cbd4139a95 upstream.
+
+wait_for_completion_interruptible_timeout() may return negative value.
+In this case, checking if (t > 0)  will return true if t is unsigned.
+
+Signed-off-by: Axel Lin <axel.lin@gmail.com>
+Acked-by: Lars-Peter Clausen <lars@metafoo.de>
+Signed-off-by: Guenter Roeck <guenter.roeck@ericsson.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ drivers/hwmon/jz4740-hwmon.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/hwmon/jz4740-hwmon.c b/drivers/hwmon/jz4740-hwmon.c
+index fea292d..b65a4da 100644
+--- a/drivers/hwmon/jz4740-hwmon.c
++++ b/drivers/hwmon/jz4740-hwmon.c
+@@ -59,7 +59,7 @@ static ssize_t jz4740_hwmon_read_adcin(struct device *dev,
+ {
+ 	struct jz4740_hwmon *hwmon = dev_get_drvdata(dev);
+ 	struct completion *completion = &hwmon->read_completion;
+-	unsigned long t;
++	long t;
+ 	unsigned long val;
+ 	int ret;
+ 
+-- 
+2.5.0
+

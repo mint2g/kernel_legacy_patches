@@ -1,0 +1,34 @@
+From 2aad1ca4711a46ca4540c924ffb84e7673a4738c Mon Sep 17 00:00:00 2001
+From: Rusty Russell <rusty@rustcorp.com.au>
+Date: Thu, 15 Dec 2011 13:34:50 +1030
+Subject: [PATCH 0497/3390] mmc: vub300: fix type of firmware_rom_wait_states
+ module parameter
+
+commit 61074287c2965edf0fc75b54ae8f4ce99f182669 upstream.
+
+You didn't mean this to be a bool.
+
+Signed-off-by: Rusty Russell <rusty@rustcorp.com.au>
+Acked-by: Tony Olech <tony.olech@elandigitalsystems.com>
+Signed-off-by: Chris Ball <cjb@laptop.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ drivers/mmc/host/vub300.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/mmc/host/vub300.c b/drivers/mmc/host/vub300.c
+index d4455ff..52f4b64 100644
+--- a/drivers/mmc/host/vub300.c
++++ b/drivers/mmc/host/vub300.c
+@@ -259,7 +259,7 @@ static int firmware_rom_wait_states = 0x04;
+ static int firmware_rom_wait_states = 0x1C;
+ #endif
+ 
+-module_param(firmware_rom_wait_states, bool, 0644);
++module_param(firmware_rom_wait_states, int, 0644);
+ MODULE_PARM_DESC(firmware_rom_wait_states,
+ 		 "ROM wait states byte=RRRIIEEE (Reserved Internal External)");
+ 
+-- 
+2.5.0
+

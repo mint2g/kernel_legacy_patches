@@ -1,0 +1,47 @@
+From 2e23cd501a9c6a0bfbe2b44781b4a35b0f0d4f29 Mon Sep 17 00:00:00 2001
+From: Thomas Meyer <thomas@m3y3r.de>
+Date: Mon, 19 Dec 2011 17:11:55 -0800
+Subject: [PATCH 0496/3390] nilfs2: unbreak compat ioctl
+
+commit 695c60f21c69e525a89279a5f35bae4ff237afbc upstream.
+
+commit 828b1c50ae ("nilfs2: add compat ioctl") incidentally broke all
+other NILFS compat ioctls.  Make them work again.
+
+Signed-off-by: Thomas Meyer <thomas@m3y3r.de>
+Signed-off-by: Ryusuke Konishi <konishi.ryusuke@lab.ntt.co.jp>
+Tested-by: Ryusuke Konishi <konishi.ryusuke@lab.ntt.co.jp>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ fs/nilfs2/ioctl.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/fs/nilfs2/ioctl.c b/fs/nilfs2/ioctl.c
+index 41d6743..3e65427 100644
+--- a/fs/nilfs2/ioctl.c
++++ b/fs/nilfs2/ioctl.c
+@@ -842,6 +842,19 @@ long nilfs_compat_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+ 	case FS_IOC32_GETVERSION:
+ 		cmd = FS_IOC_GETVERSION;
+ 		break;
++	case NILFS_IOCTL_CHANGE_CPMODE:
++	case NILFS_IOCTL_DELETE_CHECKPOINT:
++	case NILFS_IOCTL_GET_CPINFO:
++	case NILFS_IOCTL_GET_CPSTAT:
++	case NILFS_IOCTL_GET_SUINFO:
++	case NILFS_IOCTL_GET_SUSTAT:
++	case NILFS_IOCTL_GET_VINFO:
++	case NILFS_IOCTL_GET_BDESCS:
++	case NILFS_IOCTL_CLEAN_SEGMENTS:
++	case NILFS_IOCTL_SYNC:
++	case NILFS_IOCTL_RESIZE:
++	case NILFS_IOCTL_SET_ALLOC_RANGE:
++		break;
+ 	default:
+ 		return -ENOIOCTLCMD;
+ 	}
+-- 
+2.5.0
+

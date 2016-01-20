@@ -1,0 +1,34 @@
+From b004f11dd710379a31fa09ce22843b52e6f78a13 Mon Sep 17 00:00:00 2001
+From: Ian Abbott <abbotti@mev.co.uk>
+Date: Fri, 31 Aug 2012 20:41:30 +0100
+Subject: [PATCH 1867/3390] staging: comedi: das08: Correct AO output for
+ das08jr-16-ao
+
+commit 61ed59ed09e6ad2b8395178ea5ad5f653bba08e3 upstream.
+
+Don't zero out bits 15..12 of the data value in `das08jr_ao_winsn()` as
+that knobbles the upper three-quarters of the output range for the
+'das08jr-16-ao' board.
+
+Signed-off-by: Ian Abbott <abbotti@mev.co.uk>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/staging/comedi/drivers/das08.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/staging/comedi/drivers/das08.c b/drivers/staging/comedi/drivers/das08.c
+index 3141dc8..966b693 100644
+--- a/drivers/staging/comedi/drivers/das08.c
++++ b/drivers/staging/comedi/drivers/das08.c
+@@ -655,7 +655,7 @@ static int das08jr_ao_winsn(struct comedi_device *dev,
+ 	int chan;
+ 
+ 	lsb = data[0] & 0xff;
+-	msb = (data[0] >> 8) & 0xf;
++	msb = (data[0] >> 8) & 0xff;
+ 
+ 	chan = CR_CHAN(insn->chanspec);
+ 
+-- 
+2.5.0
+

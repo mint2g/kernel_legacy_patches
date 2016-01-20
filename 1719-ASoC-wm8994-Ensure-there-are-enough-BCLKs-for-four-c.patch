@@ -1,0 +1,33 @@
+From 3b6ae1807d29f8cacd63fddf513110f9308b4c8e Mon Sep 17 00:00:00 2001
+From: Mark Brown <broonie@opensource.wolfsonmicro.com>
+Date: Fri, 22 Jun 2012 17:21:17 +0100
+Subject: [PATCH 1719/3390] ASoC: wm8994: Ensure there are enough BCLKs for
+ four channels
+
+commit b8edf3e5522735c8ce78b81845f7a1a2d4a08626 upstream.
+
+Otherwise if someone tries to use all four channels on AIF1 with the
+device in master mode we won't be able to clock out all the data.
+
+Signed-off-by: Mark Brown <broonie@opensource.wolfsonmicro.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ sound/soc/codecs/wm8994.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sound/soc/codecs/wm8994.c b/sound/soc/codecs/wm8994.c
+index 2194912..1f7616d 100644
+--- a/sound/soc/codecs/wm8994.c
++++ b/sound/soc/codecs/wm8994.c
+@@ -2127,7 +2127,7 @@ static int wm8994_hw_params(struct snd_pcm_substream *substream,
+ 		return -EINVAL;
+ 	}
+ 
+-	bclk_rate = params_rate(params) * 2;
++	bclk_rate = params_rate(params) * 4;
+ 	switch (params_format(params)) {
+ 	case SNDRV_PCM_FORMAT_S16_LE:
+ 		bclk_rate *= 16;
+-- 
+2.5.0
+

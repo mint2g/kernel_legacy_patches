@@ -1,0 +1,54 @@
+From 973c38c2d69dabf942f510d5bb2af8c3f1669c82 Mon Sep 17 00:00:00 2001
+From: Mark Brown <broonie@opensource.wolfsonmicro.com>
+Date: Wed, 22 Feb 2012 15:52:56 +0000
+Subject: [PATCH 0929/3390] ASoC: dapm: Check for bias level when powering down
+
+commit 7679e42ec833ed70aa34790a5f39dcb7e5bda4fe upstream.
+
+Recent enhancements in the bias management means that we might not be
+in standby when the CODEC is idle and can have active widgets without
+being in full power mode but the shutdown functionality assumes these
+things. Add checks for the bias level at each stage so that we don't
+do transitions other than the ON->PREPARE->STANDBY->OFF ones that the
+drivers are expecting.
+
+Signed-off-by: Mark Brown <broonie@opensource.wolfsonmicro.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ sound/soc/soc-dapm.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/sound/soc/soc-dapm.c b/sound/soc/soc-dapm.c
+index 32ab7fc..058c0a8 100644
+--- a/sound/soc/soc-dapm.c
++++ b/sound/soc/soc-dapm.c
+@@ -2615,9 +2615,13 @@ static void soc_dapm_shutdown_codec(struct snd_soc_dapm_context *dapm)
+ 	 * standby.
+ 	 */
+ 	if (powerdown) {
+-		snd_soc_dapm_set_bias_level(dapm, SND_SOC_BIAS_PREPARE);
++		if (dapm->bias_level == SND_SOC_BIAS_ON)
++			snd_soc_dapm_set_bias_level(dapm,
++						    SND_SOC_BIAS_PREPARE);
+ 		dapm_seq_run(dapm, &down_list, 0, false);
+-		snd_soc_dapm_set_bias_level(dapm, SND_SOC_BIAS_STANDBY);
++		if (dapm->bias_level == SND_SOC_BIAS_PREPARE)
++			snd_soc_dapm_set_bias_level(dapm,
++						    SND_SOC_BIAS_STANDBY);
+ 	}
+ }
+ 
+@@ -2630,7 +2634,9 @@ void snd_soc_dapm_shutdown(struct snd_soc_card *card)
+ 
+ 	list_for_each_entry(codec, &card->codec_dev_list, list) {
+ 		soc_dapm_shutdown_codec(&codec->dapm);
+-		snd_soc_dapm_set_bias_level(&codec->dapm, SND_SOC_BIAS_OFF);
++		if (codec->dapm.bias_level == SND_SOC_BIAS_STANDBY)
++			snd_soc_dapm_set_bias_level(&codec->dapm,
++						    SND_SOC_BIAS_OFF);
+ 	}
+ }
+ 
+-- 
+2.5.0
+

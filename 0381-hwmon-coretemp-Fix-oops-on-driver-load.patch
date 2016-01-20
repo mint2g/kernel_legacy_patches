@@ -1,0 +1,37 @@
+From 0500898d30ba531cc932c2db171bf2f27ca78abe Mon Sep 17 00:00:00 2001
+From: Jean Delvare <khali@linux-fr.org>
+Date: Thu, 1 Dec 2011 17:21:28 +0100
+Subject: [PATCH 0381/3390] hwmon: (coretemp) Fix oops on driver load
+
+This is for stable kernel branch 3.0 only. Previous and later versions
+have different code paths and are not affected by this bug.
+
+If the CPU microcode is too old, the coretemp driver won't work. But
+instead of failing gracefully, it currently oops. Check for NULL
+platform device data to avoid this.
+
+Signed-off-by: Jean Delvare <khali@linux-fr.org>
+Acked-by: Durgadoss R <durgadoss.r@intel.com>
+Acked-by: Guenter Roeck <guenter.roeck@ericsson.com>
+Cc: Fenghua Yu <fenghua.yu@intel.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ drivers/hwmon/coretemp.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/hwmon/coretemp.c b/drivers/hwmon/coretemp.c
+index f642194..835ae42 100644
+--- a/drivers/hwmon/coretemp.c
++++ b/drivers/hwmon/coretemp.c
+@@ -539,6 +539,8 @@ static void coretemp_add_core(unsigned int cpu, int pkg_flag)
+ 		return;
+ 
+ 	pdata = platform_get_drvdata(pdev);
++	if (!pdata)
++		return;
+ 
+ 	err = create_core_data(pdata, pdev, cpu, pkg_flag);
+ 	if (err)
+-- 
+2.5.0
+

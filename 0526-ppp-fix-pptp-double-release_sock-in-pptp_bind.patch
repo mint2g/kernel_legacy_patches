@@ -1,0 +1,34 @@
+From e2f377870311c6e2ecf77e1ed6bbcb175ce0dde9 Mon Sep 17 00:00:00 2001
+From: Djalal Harouni <tixxdz@opendz.org>
+Date: Tue, 6 Dec 2011 15:47:12 +0000
+Subject: [PATCH 0526/3390] ppp: fix pptp double release_sock in pptp_bind()
+
+[ Upstream commit a454daceb78844a09c08b6e2d8badcb76a5d73b9 ]
+
+Signed-off-by: Djalal Harouni <tixxdz@opendz.org>
+Acked-by: Eric Dumazet <eric.dumazet@gmail.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ drivers/net/pptp.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/drivers/net/pptp.c b/drivers/net/pptp.c
+index 1286fe2..4b3a68b 100644
+--- a/drivers/net/pptp.c
++++ b/drivers/net/pptp.c
+@@ -418,10 +418,8 @@ static int pptp_bind(struct socket *sock, struct sockaddr *uservaddr,
+ 	lock_sock(sk);
+ 
+ 	opt->src_addr = sp->sa_addr.pptp;
+-	if (add_chan(po)) {
+-		release_sock(sk);
++	if (add_chan(po))
+ 		error = -EBUSY;
+-	}
+ 
+ 	release_sock(sk);
+ 	return error;
+-- 
+2.5.0
+

@@ -1,0 +1,29 @@
+From 6dbe15f453482a897c3db411cfdcffef27e71c6c Mon Sep 17 00:00:00 2001
+From: Mark Brown <broonie@opensource.wolfsonmicro.com>
+Date: Mon, 21 Nov 2011 11:55:41 +0000
+Subject: [PATCH 0368/3390] ASoC: Ensure WM8731 register cache is synced when
+ resuming from disabled
+
+commit ed3e80c4c991a52f9fce3421536a78e331ae0949 upstream.
+
+Signed-off-by: Mark Brown <broonie@opensource.wolfsonmicro.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ sound/soc/codecs/wm8731.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/sound/soc/codecs/wm8731.c b/sound/soc/codecs/wm8731.c
+index 76b4361..f5a0ec4 100644
+--- a/sound/soc/codecs/wm8731.c
++++ b/sound/soc/codecs/wm8731.c
+@@ -463,6 +463,7 @@ static int wm8731_set_bias_level(struct snd_soc_codec *codec,
+ 		snd_soc_write(codec, WM8731_PWR, 0xffff);
+ 		regulator_bulk_disable(ARRAY_SIZE(wm8731->supplies),
+ 				       wm8731->supplies);
++		codec->cache_sync = 1;
+ 		break;
+ 	}
+ 	codec->dapm.bias_level = level;
+-- 
+2.5.0
+

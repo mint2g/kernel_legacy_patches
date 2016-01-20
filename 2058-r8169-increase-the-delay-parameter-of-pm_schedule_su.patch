@@ -1,0 +1,37 @@
+From c43209e91508d1dbfa21203dc491ba67e0d30579 Mon Sep 17 00:00:00 2001
+From: hayeswang <hayeswang@realtek.com>
+Date: Fri, 5 Oct 2012 23:29:13 +0200
+Subject: [PATCH 2058/3390] r8169: increase the delay parameter of
+ pm_schedule_suspend
+
+commit 10953db8e1a278742ef7e64a3d1491802bcfa98b upstream
+The link down would occur when reseting PHY. And it would take about 2 ~ 5
+seconds from link down to link up. If the delay of pm_schedule_suspend is
+not long enough, the device would enter runtime_suspend before link up.
+After link up, the device would wake up and reset PHY again. Then, you
+would find the driver keep in a loop of runtime_suspend and rumtime_resume.
+
+Signed-off-by: Hayes Wang <hayeswang@realtek.com>
+Acked-by: Francois Romieu <romieu@fr.zoreil.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/net/r8169.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/r8169.c b/drivers/net/r8169.c
+index 3fe4fd3..95305d3 100644
+--- a/drivers/net/r8169.c
++++ b/drivers/net/r8169.c
+@@ -1157,7 +1157,7 @@ static void __rtl8169_check_link_status(struct net_device *dev,
+ 		netif_carrier_off(dev);
+ 		netif_info(tp, ifdown, dev, "link down\n");
+ 		if (pm)
+-			pm_schedule_suspend(&tp->pci_dev->dev, 100);
++			pm_schedule_suspend(&tp->pci_dev->dev, 5000);
+ 	}
+ 	spin_unlock_irqrestore(&tp->lock, flags);
+ }
+-- 
+2.5.0
+

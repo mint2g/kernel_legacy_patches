@@ -1,0 +1,40 @@
+From b0da5e7b1493c59b04604d6839565a6135773002 Mon Sep 17 00:00:00 2001
+From: Tommaso Massimi <tmassimi@gmail.com>
+Date: Tue, 20 Sep 2011 09:16:09 -0700
+Subject: [PATCH 0070/3390] Platform: samsung_laptop: add support for X520
+ machines.
+
+commit 7500eeb08a179e61a4219288c21407d63d1e9c64 upstream.
+
+my samsung laptop would be very happy if you add
+these lines to the file drivers/platform/x86/samsung-laptop.c
+
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+Signed-off-by: Matthew Garrett <mjg@redhat.com>
+---
+ drivers/platform/x86/samsung-laptop.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/drivers/platform/x86/samsung-laptop.c b/drivers/platform/x86/samsung-laptop.c
+index 35c781b..618cd4e 100644
+--- a/drivers/platform/x86/samsung-laptop.c
++++ b/drivers/platform/x86/samsung-laptop.c
+@@ -685,6 +685,15 @@ static struct dmi_system_id __initdata samsung_dmi_table[] = {
+ 		},
+ 		.callback = dmi_check_cb,
+ 	},
++		{
++		.ident = "X520",
++		.matches = {
++			DMI_MATCH(DMI_SYS_VENDOR, "SAMSUNG ELECTRONICS CO., LTD."),
++			DMI_MATCH(DMI_PRODUCT_NAME, "X520"),
++			DMI_MATCH(DMI_BOARD_NAME, "X520"),
++		},
++		.callback = dmi_check_cb,
++	},
+ 	{ },
+ };
+ MODULE_DEVICE_TABLE(dmi, samsung_dmi_table);
+-- 
+2.5.0
+

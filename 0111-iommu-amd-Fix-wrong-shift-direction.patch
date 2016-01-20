@@ -1,0 +1,32 @@
+From 9bdb666778b0eb502554288ac3188139c3c45f0e Mon Sep 17 00:00:00 2001
+From: Joerg Roedel <joerg.roedel@amd.com>
+Date: Tue, 11 Oct 2011 17:41:32 +0200
+Subject: [PATCH 0111/3390] iommu/amd: Fix wrong shift direction
+
+commit fcd0861db1cf4e6ed99f60a815b7b72c2ed36ea4 upstream.
+
+The shift direction was wrong because the function takes a
+page number and i is the address is the loop.
+
+Signed-off-by: Joerg Roedel <joerg.roedel@amd.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ arch/x86/kernel/amd_iommu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/x86/kernel/amd_iommu.c b/arch/x86/kernel/amd_iommu.c
+index d3d9d50..bfd75ff 100644
+--- a/arch/x86/kernel/amd_iommu.c
++++ b/arch/x86/kernel/amd_iommu.c
+@@ -1203,7 +1203,7 @@ static int alloc_new_range(struct dma_ops_domain *dma_dom,
+ 		if (!pte || !IOMMU_PTE_PRESENT(*pte))
+ 			continue;
+ 
+-		dma_ops_reserve_addresses(dma_dom, i << PAGE_SHIFT, 1);
++		dma_ops_reserve_addresses(dma_dom, i >> PAGE_SHIFT, 1);
+ 	}
+ 
+ 	update_domain(&dma_dom->domain);
+-- 
+2.5.0
+

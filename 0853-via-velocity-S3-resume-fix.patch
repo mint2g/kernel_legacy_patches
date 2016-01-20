@@ -1,0 +1,37 @@
+From d67f60702b0085eb2ad772b9f7ddf728fc42d7b8 Mon Sep 17 00:00:00 2001
+From: Hagen Paul Pfeifer <hagen@jauu.net>
+Date: Sat, 4 Feb 2012 23:22:26 +0000
+Subject: [PATCH 0853/3390] via-velocity: S3 resume fix.
+
+[ Upstream commit b530b1930bbd9d005345133f0ff0c556d2a52b19 ]
+
+Initially diagnosed on Ubuntu 11.04 with kernel 2.6.38.
+
+velocity_close is not called during a suspend / resume cycle in this
+driver and it has no business playing directly with power states.
+
+Signed-off-by: David Lv <DavidLv@viatech.com.cn>
+Acked-by: Francois Romieu <romieu@fr.zoreil.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/net/via-velocity.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/drivers/net/via-velocity.c b/drivers/net/via-velocity.c
+index 06daa9d..c7e4934 100644
+--- a/drivers/net/via-velocity.c
++++ b/drivers/net/via-velocity.c
+@@ -2513,9 +2513,6 @@ static int velocity_close(struct net_device *dev)
+ 	if (dev->irq != 0)
+ 		free_irq(dev->irq, dev);
+ 
+-	/* Power down the chip */
+-	pci_set_power_state(vptr->pdev, PCI_D3hot);
+-
+ 	velocity_free_rings(vptr);
+ 
+ 	vptr->flags &= (~VELOCITY_FLAGS_OPENED);
+-- 
+2.5.0
+

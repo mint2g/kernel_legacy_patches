@@ -1,0 +1,35 @@
+From 1dc88f68f554b318691763867aab4ec7adc60945 Mon Sep 17 00:00:00 2001
+From: "Luck, Tony" <tony.luck@intel.com>
+Date: Fri, 21 Oct 2011 14:42:55 -0700
+Subject: [PATCH 0234/3390] ACPI atomicio: Convert width in bits to bytes in
+ __acpi_ioremap_fast()
+
+commit 3bf3f8b19d2bfccc40f13c456bf339fd8f535ebc upstream.
+
+Callers to __acpi_ioremap_fast() pass the bit_width that they found in the
+acpi_generic_address structure. Convert from bits to bytes when passing to
+__acpi_find_iomap() - as it wants to see bytes, not bits.
+
+Signed-off-by: Tony Luck <tony.luck@intel.com>
+Signed-off-by: Len Brown <len.brown@intel.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ drivers/acpi/atomicio.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/acpi/atomicio.c b/drivers/acpi/atomicio.c
+index 7489b89..f151afe 100644
+--- a/drivers/acpi/atomicio.c
++++ b/drivers/acpi/atomicio.c
+@@ -76,7 +76,7 @@ static void __iomem *__acpi_ioremap_fast(phys_addr_t paddr,
+ {
+ 	struct acpi_iomap *map;
+ 
+-	map = __acpi_find_iomap(paddr, size);
++	map = __acpi_find_iomap(paddr, size/8);
+ 	if (map)
+ 		return map->vaddr + (paddr - map->paddr);
+ 	else
+-- 
+2.5.0
+

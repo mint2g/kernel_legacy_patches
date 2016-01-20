@@ -1,0 +1,41 @@
+From 0ea64c49dc38aa94552c3fa1d81b0901bbfbccd1 Mon Sep 17 00:00:00 2001
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Date: Wed, 10 Apr 2013 15:21:39 -0700
+Subject: [PATCH 2836/3390] Revert "mwifiex: cancel cmd timer and free curr_cmd
+ in shutdown process
+
+revert commit b9f1f48ce20a1b923429c216669d03b5a900a8cf which is commit
+084c7189acb3f969c855536166042e27f5dd703f upstream.
+
+It shouldn't have been applied to the 3.0-stable tree.
+
+Reported-by: Ben Hutchings <ben@decadent.org.uk>
+Cc: Marco Cesarano <marco@marvell.com>
+Reported-by: Bing Zhao <bzhao@marvell.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/net/wireless/mwifiex/init.c | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/drivers/net/wireless/mwifiex/init.c b/drivers/net/wireless/mwifiex/init.c
+index 45dfc2b..3f1559e 100644
+--- a/drivers/net/wireless/mwifiex/init.c
++++ b/drivers/net/wireless/mwifiex/init.c
+@@ -561,14 +561,6 @@ mwifiex_shutdown_drv(struct mwifiex_adapter *adapter)
+ 		return ret;
+ 	}
+ 
+-	/* cancel current command */
+-	if (adapter->curr_cmd) {
+-		dev_warn(adapter->dev, "curr_cmd is still in processing\n");
+-		del_timer(&adapter->cmd_timer);
+-		mwifiex_insert_cmd_to_free_q(adapter, adapter->curr_cmd);
+-		adapter->curr_cmd = NULL;
+-	}
+-
+ 	/* shut down mwifiex */
+ 	dev_dbg(adapter->dev, "info: shutdown mwifiex...\n");
+ 
+-- 
+2.5.0
+

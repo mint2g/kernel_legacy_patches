@@ -1,0 +1,35 @@
+From bd874f70e245977197782bc0e03c658f3e93573b Mon Sep 17 00:00:00 2001
+From: Jesper Nilsson <jesper.nilsson@axis.com>
+Date: Mon, 24 Oct 2011 11:19:25 +0200
+Subject: [PATCH 3233/3390] CRIS: Add _sdata to vmlinux.lds.S
+
+commit 473e162eea465e60578edb93341752e7f1c1dacc upstream.
+
+Fixes link error:
+  LD      vmlinux
+kernel/built-in.o: In function `core_kernel_data':
+(.text+0x13e44): undefined reference to `_sdata'
+
+Signed-off-by: Jesper Nilsson <jesper.nilsson@axis.com>
+Cc: Guenter Roeck <linux@roeck-us.net>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ arch/cris/kernel/vmlinux.lds.S | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/cris/kernel/vmlinux.lds.S b/arch/cris/kernel/vmlinux.lds.S
+index a6990cb..a68b983 100644
+--- a/arch/cris/kernel/vmlinux.lds.S
++++ b/arch/cris/kernel/vmlinux.lds.S
+@@ -52,6 +52,7 @@ SECTIONS
+ 
+ 	EXCEPTION_TABLE(4)
+ 
++	_sdata = .;
+ 	RODATA
+ 
+ 	. = ALIGN (4);
+-- 
+2.5.0
+

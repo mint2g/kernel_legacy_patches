@@ -1,0 +1,54 @@
+From 7f6df60755431d12897da745980316ad900d8b56 Mon Sep 17 00:00:00 2001
+From: "David S. Miller" <davem@davemloft.net>
+Date: Sun, 14 Oct 2012 17:59:40 -0700
+Subject: [PATCH 2142/3390] sparc64: Like x86 we should check current->mm
+ during perf backtrace generation.
+
+[ Upstream commit 08280e6c4c2e8049ac61d9e8e3536ec1df629c0d ]
+
+If the MM is not active, only report the top-level PC.  Do not try to
+access the address space.
+
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ arch/sparc/kernel/perf_event.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/arch/sparc/kernel/perf_event.c b/arch/sparc/kernel/perf_event.c
+index 6860d40..bcc3eef 100644
+--- a/arch/sparc/kernel/perf_event.c
++++ b/arch/sparc/kernel/perf_event.c
+@@ -1380,8 +1380,6 @@ static void perf_callchain_user_64(struct perf_callchain_entry *entry,
+ {
+ 	unsigned long ufp;
+ 
+-	perf_callchain_store(entry, regs->tpc);
+-
+ 	ufp = regs->u_regs[UREG_I6] + STACK_BIAS;
+ 	do {
+ 		struct sparc_stackf *usf, sf;
+@@ -1402,8 +1400,6 @@ static void perf_callchain_user_32(struct perf_callchain_entry *entry,
+ {
+ 	unsigned long ufp;
+ 
+-	perf_callchain_store(entry, regs->tpc);
+-
+ 	ufp = regs->u_regs[UREG_I6] & 0xffffffffUL;
+ 	do {
+ 		struct sparc_stackf32 *usf, sf;
+@@ -1422,6 +1418,11 @@ static void perf_callchain_user_32(struct perf_callchain_entry *entry,
+ void
+ perf_callchain_user(struct perf_callchain_entry *entry, struct pt_regs *regs)
+ {
++	perf_callchain_store(entry, regs->tpc);
++
++	if (!current->mm)
++		return;
++
+ 	flushw_user();
+ 	if (test_thread_flag(TIF_32BIT))
+ 		perf_callchain_user_32(entry, regs);
+-- 
+2.5.0
+

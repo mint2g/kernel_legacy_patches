@@ -1,0 +1,31 @@
+From 0ee936021bbea1a9d060cad85eb4796f261489c6 Mon Sep 17 00:00:00 2001
+From: Michael Krufky <mkrufky@linuxtv.org>
+Date: Thu, 22 Mar 2012 13:55:05 -0300
+Subject: [PATCH 1440/3390] smsusb: add autodetection support for USB ID
+ 2040:c0a0
+
+commit 4d1b58b84472d1d300a66e1c5fd765b21e74ba15 upstream.
+
+Signed-off-by: Michael Krufky <mkrufky@linuxtv.org>
+Signed-off-by: Mauro Carvalho Chehab <mchehab@redhat.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/media/dvb/siano/smsusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/media/dvb/siano/smsusb.c b/drivers/media/dvb/siano/smsusb.c
+index 0c8164a..d755407 100644
+--- a/drivers/media/dvb/siano/smsusb.c
++++ b/drivers/media/dvb/siano/smsusb.c
+@@ -541,6 +541,8 @@ static const struct usb_device_id smsusb_id_table[] __devinitconst = {
+ 		.driver_info = SMS1XXX_BOARD_HAUPPAUGE_WINDHAM },
+ 	{ USB_DEVICE(0x2040, 0xc090),
+ 		.driver_info = SMS1XXX_BOARD_HAUPPAUGE_WINDHAM },
++	{ USB_DEVICE(0x2040, 0xc0a0),
++		.driver_info = SMS1XXX_BOARD_HAUPPAUGE_WINDHAM },
+ 	{ } /* Terminating entry */
+ 	};
+ 
+-- 
+2.5.0
+

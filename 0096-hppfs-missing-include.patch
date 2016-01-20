@@ -1,0 +1,29 @@
+From b2f0a734b06e2e257bb0565800ac222244d981dc Mon Sep 17 00:00:00 2001
+From: Al Viro <viro@zeniv.linux.org.uk>
+Date: Wed, 27 Jul 2011 22:21:58 -0400
+Subject: [PATCH 0096/3390] hppfs: missing include
+
+commit d6b722aa383a467a43d09ee38e866981abba08ab upstream.
+
+Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
+Cc: Miklos Szeredi <miklos@szeredi.hu>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ fs/hppfs/hppfs.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/fs/hppfs/hppfs.c b/fs/hppfs/hppfs.c
+index 85c098a..9d71c95 100644
+--- a/fs/hppfs/hppfs.c
++++ b/fs/hppfs/hppfs.c
+@@ -16,6 +16,7 @@
+ #include <linux/statfs.h>
+ #include <linux/types.h>
+ #include <linux/pid_namespace.h>
++#include <linux/namei.h>
+ #include <asm/uaccess.h>
+ #include "os.h"
+ 
+-- 
+2.5.0
+

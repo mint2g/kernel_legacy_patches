@@ -1,0 +1,44 @@
+From 9e7d7c544c8a3ec827f72d9af9c2c3efa45e5325 Mon Sep 17 00:00:00 2001
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 7 Jun 2012 22:59:59 +0000
+Subject: [PATCH 1554/3390] be2net: fix a race in be_xmit()
+
+[ Upstream commit cd8f76c0a0c6fce0b2cf23c9bd0123f91453f46d ]
+
+As soon as hardware is notified of a transmit, we no longer can assume
+skb can be dereferenced, as TX completion might have freed the packet.
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Sathya Perla <sathya.perla@emulex.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/net/benet/be_main.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/benet/be_main.c b/drivers/net/benet/be_main.c
+index a485f7f..2ce5db5 100644
+--- a/drivers/net/benet/be_main.c
++++ b/drivers/net/benet/be_main.c
+@@ -763,6 +763,8 @@ static netdev_tx_t be_xmit(struct sk_buff *skb,
+ 
+ 	copied = make_tx_wrbs(adapter, skb, wrb_cnt, dummy_wrb);
+ 	if (copied) {
++		int gso_segs = skb_shinfo(skb)->gso_segs;
++
+ 		/* record the sent skb in the sent_skb table */
+ 		BUG_ON(tx_obj->sent_skb_list[start]);
+ 		tx_obj->sent_skb_list[start] = skb;
+@@ -780,8 +782,7 @@ static netdev_tx_t be_xmit(struct sk_buff *skb,
+ 
+ 		be_txq_notify(adapter, txq->id, wrb_cnt);
+ 
+-		be_tx_stats_update(adapter, wrb_cnt, copied,
+-				skb_shinfo(skb)->gso_segs, stopped);
++		be_tx_stats_update(adapter, wrb_cnt, copied, gso_segs, stopped);
+ 	} else {
+ 		txq->head = start;
+ 		dev_kfree_skb_any(skb);
+-- 
+2.5.0
+

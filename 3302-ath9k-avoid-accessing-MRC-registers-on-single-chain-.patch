@@ -1,0 +1,35 @@
+From 8600be1d3927e177b80c7ee9263ef3b28a0ba115 Mon Sep 17 00:00:00 2001
+From: Felix Fietkau <nbd@openwrt.org>
+Date: Tue, 13 Aug 2013 12:33:28 +0200
+Subject: [PATCH 3302/3390] ath9k: avoid accessing MRC registers on
+ single-chain devices
+
+commit a1c781bb20ac1e03280e420abd47a99eb8bbdd3b upstream.
+
+They are not implemented, and accessing them might trigger errors
+
+Signed-off-by: Felix Fietkau <nbd@openwrt.org>
+Signed-off-by: John W. Linville <linville@tuxdriver.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/net/wireless/ath/ath9k/ar9003_phy.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/net/wireless/ath/ath9k/ar9003_phy.c b/drivers/net/wireless/ath/ath9k/ar9003_phy.c
+index 892c48b..b8a26d2 100644
+--- a/drivers/net/wireless/ath/ath9k/ar9003_phy.c
++++ b/drivers/net/wireless/ath/ath9k/ar9003_phy.c
+@@ -1005,6 +1005,10 @@ static bool ar9003_hw_ani_control(struct ath_hw *ah,
+ 		 * is_on == 0 means MRC CCK is OFF (more noise imm)
+ 		 */
+ 		bool is_on = param ? 1 : 0;
++
++		if (ah->caps.rx_chainmask == 1)
++			break;
++
+ 		REG_RMW_FIELD(ah, AR_PHY_MRC_CCK_CTRL,
+ 			      AR_PHY_MRC_CCK_ENABLE, is_on);
+ 		REG_RMW_FIELD(ah, AR_PHY_MRC_CCK_CTRL,
+-- 
+2.5.0
+

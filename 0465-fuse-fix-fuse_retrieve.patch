@@ -1,0 +1,48 @@
+From 60923f67e3a0ed74d3f0c6c25a0a3e5e41795644 Mon Sep 17 00:00:00 2001
+From: Miklos Szeredi <mszeredi@suse.cz>
+Date: Tue, 13 Dec 2011 10:36:59 +0100
+Subject: [PATCH 0465/3390] fuse: fix fuse_retrieve
+
+commit 48706d0a91583d08c56e7ef2a7602d99c8d4133f upstream.
+
+Fix two bugs in fuse_retrieve():
+
+ - retrieving more than one page would yield repeated instances of the
+   first page
+
+ - if more than FUSE_MAX_PAGES_PER_REQ pages were requested than the
+   request page array would overflow
+
+fuse_retrieve() was added in 2.6.36 and these bugs had been there since the
+beginning.
+
+Signed-off-by: Miklos Szeredi <mszeredi@suse.cz>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ fs/fuse/dev.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/fs/fuse/dev.c b/fs/fuse/dev.c
+index 5cb8614..2aaf3ea 100644
+--- a/fs/fuse/dev.c
++++ b/fs/fuse/dev.c
+@@ -1512,7 +1512,7 @@ static int fuse_retrieve(struct fuse_conn *fc, struct inode *inode,
+ 	else if (outarg->offset + num > file_size)
+ 		num = file_size - outarg->offset;
+ 
+-	while (num) {
++	while (num && req->num_pages < FUSE_MAX_PAGES_PER_REQ) {
+ 		struct page *page;
+ 		unsigned int this_num;
+ 
+@@ -1526,6 +1526,7 @@ static int fuse_retrieve(struct fuse_conn *fc, struct inode *inode,
+ 
+ 		num -= this_num;
+ 		total_len += this_num;
++		index++;
+ 	}
+ 	req->misc.retrieve_in.offset = outarg->offset;
+ 	req->misc.retrieve_in.size = total_len;
+-- 
+2.5.0
+

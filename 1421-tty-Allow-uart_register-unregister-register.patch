@@ -1,0 +1,32 @@
+From 3c867337cdb88f7b31f9fcf07003e97d408fcd26 Mon Sep 17 00:00:00 2001
+From: Alan Cox <alan@linux.intel.com>
+Date: Mon, 14 May 2012 14:51:22 +0100
+Subject: [PATCH 1421/3390] tty: Allow uart_register/unregister/register
+
+commit 1e66cded334e6cea596c72f6f650eec351b1e959 upstream.
+
+This is legitimate but because we don't clear the drv->state pointer in the
+unregister code causes a bogus BUG().
+
+Resolves-bug: https://bugzilla.kernel.org/show_bug.cgi?id=42880
+Signed-off-by: Alan Cox <alan@linux.intel.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/tty/serial/serial_core.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/tty/serial/serial_core.c b/drivers/tty/serial/serial_core.c
+index 6bc20d7..de5e33f 100644
+--- a/drivers/tty/serial/serial_core.c
++++ b/drivers/tty/serial/serial_core.c
+@@ -2325,6 +2325,7 @@ void uart_unregister_driver(struct uart_driver *drv)
+ 	tty_unregister_driver(p);
+ 	put_tty_driver(p);
+ 	kfree(drv->state);
++	drv->state = NULL;
+ 	drv->tty_driver = NULL;
+ }
+ 
+-- 
+2.5.0
+

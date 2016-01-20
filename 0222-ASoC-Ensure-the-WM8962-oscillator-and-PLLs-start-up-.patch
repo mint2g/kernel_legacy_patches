@@ -1,0 +1,36 @@
+From 22bef71b2e411ee05b9b9199394c3a209924926f Mon Sep 17 00:00:00 2001
+From: Mark Brown <broonie@opensource.wolfsonmicro.com>
+Date: Tue, 1 Nov 2011 13:53:37 +0000
+Subject: [PATCH 0222/3390] ASoC: Ensure the WM8962 oscillator and PLLs start
+ up disabled
+
+commit 2af8de8c39cf58e5a5e40a9d5d71332da98e6ba7 upstream.
+
+Since there is no current software control for these they would otherwise
+be left enabled, consuming power.
+
+Signed-off-by: Mark Brown <broonie@opensource.wolfsonmicro.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ sound/soc/codecs/wm8962.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/sound/soc/codecs/wm8962.c b/sound/soc/codecs/wm8962.c
+index ebff8ad..4a0f666 100644
+--- a/sound/soc/codecs/wm8962.c
++++ b/sound/soc/codecs/wm8962.c
+@@ -3829,6 +3829,11 @@ static int wm8962_probe(struct snd_soc_codec *codec)
+ 	 */
+ 	snd_soc_update_bits(codec, WM8962_CLOCKING2, WM8962_SYSCLK_ENA, 0);
+ 
++	/* Ensure that the oscillator and PLLs are disabled */
++	snd_soc_update_bits(codec, WM8962_PLL2,
++			    WM8962_OSC_ENA | WM8962_PLL2_ENA | WM8962_PLL3_ENA,
++			    0);
++
+ 	regulator_bulk_disable(ARRAY_SIZE(wm8962->supplies), wm8962->supplies);
+ 
+ 	if (pdata) {
+-- 
+2.5.0
+

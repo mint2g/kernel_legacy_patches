@@ -1,0 +1,33 @@
+From 0f48082f6606cedf53b8a3beb3ca9e73134b8005 Mon Sep 17 00:00:00 2001
+From: Axel Lin <axel.lin@gmail.com>
+Date: Mon, 31 Oct 2011 10:20:28 +0800
+Subject: [PATCH 0315/3390] pcie-gadget-spear: Add "platform:" prefix for
+ platform modalias
+
+commit 161f14191dc166c4e3f37f68af1bc199c6868b7d upstream.
+
+Since 43cc71eed1250755986da4c0f9898f9a635cb3bf (platform: prefix MODALIAS
+with "platform:"), the platform modalias is prefixed with "platform:".
+
+Signed-off-by: Axel Lin <axel.lin@gmail.com>
+Acked-by: Pratyush Anand <pratyush.anand@st.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ drivers/misc/spear13xx_pcie_gadget.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/misc/spear13xx_pcie_gadget.c b/drivers/misc/spear13xx_pcie_gadget.c
+index cfbddbe..43d073b 100644
+--- a/drivers/misc/spear13xx_pcie_gadget.c
++++ b/drivers/misc/spear13xx_pcie_gadget.c
+@@ -903,6 +903,6 @@ static void __exit spear_pcie_gadget_exit(void)
+ }
+ module_exit(spear_pcie_gadget_exit);
+ 
+-MODULE_ALIAS("pcie-gadget-spear");
++MODULE_ALIAS("platform:pcie-gadget-spear");
+ MODULE_AUTHOR("Pratyush Anand");
+ MODULE_LICENSE("GPL");
+-- 
+2.5.0
+

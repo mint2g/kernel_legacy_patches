@@ -1,0 +1,45 @@
+From 768551e1212290b6f662d30a80b4b0dc0889be95 Mon Sep 17 00:00:00 2001
+From: Francois Romieu <romieu@fr.zoreil.com>
+Date: Fri, 5 Oct 2012 23:29:19 +0200
+Subject: [PATCH 2064/3390] r8169: 8168c and later require bit 0x20 to be set
+ in Config2 for PME signaling.
+
+commit d387b427c973974dd619a33549c070ac5d0e089f upstream.
+
+The new 84xx stopped flying below the radars.
+
+Signed-off-by: Francois Romieu <romieu@fr.zoreil.com>
+Cc: Hayes Wang <hayeswang@realtek.com>
+Acked-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/net/r8169.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/drivers/net/r8169.c b/drivers/net/r8169.c
+index c9bf1e8..f8bfd52 100644
+--- a/drivers/net/r8169.c
++++ b/drivers/net/r8169.c
+@@ -299,6 +299,8 @@ enum rtl_registers {
+ 	Config0		= 0x51,
+ 	Config1		= 0x52,
+ 	Config2		= 0x53,
++#define PME_SIGNAL			(1 << 5)	/* 8168c and later */
++
+ 	Config3		= 0x54,
+ 	Config4		= 0x55,
+ 	Config5		= 0x56,
+@@ -1249,6 +1251,10 @@ static void __rtl8169_set_wol(struct rtl8169_private *tp, u32 wolopts)
+ 		RTL_W8(Config1, options);
+ 		break;
+ 	default:
++		options = RTL_R8(Config2) & ~PME_SIGNAL;
++		if (wolopts)
++			options |= PME_SIGNAL;
++		RTL_W8(Config2, options);
+ 		break;
+ 	}
+ 
+-- 
+2.5.0
+

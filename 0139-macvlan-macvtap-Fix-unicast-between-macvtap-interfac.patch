@@ -1,0 +1,36 @@
+From 89c32c14c190c6113187c7c57784695701e314e4 Mon Sep 17 00:00:00 2001
+From: David Ward <david.ward@ll.mit.edu>
+Date: Sun, 18 Sep 2011 12:53:20 +0000
+Subject: [PATCH 0139/3390] macvlan/macvtap: Fix unicast between macvtap
+ interfaces in bridge mode
+
+[ Upstream commit cb2d0f3e968bff7c6d262aca3e3ab8d4184e69b2 ]
+
+Packets should always be forwarded to the lowerdev using dev_forward_skb.
+vlan->forward is for packets being forwarded directly to another macvlan/
+macvtap device (used for multicast in bridge mode).
+
+Reported-and-tested-by: Shlomo Pongratz <shlomop@mellanox.com>
+Signed-off-by: David Ward <david.ward@ll.mit.edu>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ drivers/net/macvlan.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/macvlan.c b/drivers/net/macvlan.c
+index 2f3c48d..ab4723d 100644
+--- a/drivers/net/macvlan.c
++++ b/drivers/net/macvlan.c
+@@ -239,7 +239,7 @@ static int macvlan_queue_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		dest = macvlan_hash_lookup(port, eth->h_dest);
+ 		if (dest && dest->mode == MACVLAN_MODE_BRIDGE) {
+ 			/* send to lowerdev first for its network taps */
+-			vlan->forward(vlan->lowerdev, skb);
++			dev_forward_skb(vlan->lowerdev, skb);
+ 
+ 			return NET_XMIT_SUCCESS;
+ 		}
+-- 
+2.5.0
+

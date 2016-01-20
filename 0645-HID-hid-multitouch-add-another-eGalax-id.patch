@@ -1,0 +1,60 @@
+From 242d5138b1a8f4a2519518027fff884fce3eeba4 Mon Sep 17 00:00:00 2001
+From: Chris Bagwell <chris@cnpbagwell.com>
+Date: Wed, 23 Nov 2011 10:54:27 +0100
+Subject: [PATCH 0645/3390] HID: hid-multitouch - add another eGalax id
+
+commit 1fd8f047490dd0ec4e4db710fcbc1bd4798d944c upstream.
+
+This allows ASUS Eee Slate touchscreens to work.
+
+Signed-off-by: Chris Bagwell <chris@cnpbagwell.com>
+Reviewed-by: Benjamin Tissoires <benjamin.tissoires@gmail.com>
+Signed-off-by: Jiri Kosina <jkosina@suse.cz>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ drivers/hid/hid-core.c       | 1 +
+ drivers/hid/hid-ids.h        | 1 +
+ drivers/hid/hid-multitouch.c | 3 +++
+ 3 files changed, 5 insertions(+)
+
+diff --git a/drivers/hid/hid-core.c b/drivers/hid/hid-core.c
+index 22d53e7..e7373bf 100644
+--- a/drivers/hid/hid-core.c
++++ b/drivers/hid/hid-core.c
+@@ -1387,6 +1387,7 @@ static const struct hid_device_id hid_have_special_driver[] = {
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_DWAV, USB_DEVICE_ID_DWAV_EGALAX_MULTITOUCH2) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_DWAV, USB_DEVICE_ID_DWAV_EGALAX_MULTITOUCH3) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_DWAV, USB_DEVICE_ID_DWAV_EGALAX_MULTITOUCH4) },
++	{ HID_USB_DEVICE(USB_VENDOR_ID_DWAV, USB_DEVICE_ID_DWAV_EGALAX_MULTITOUCH5) },
+ 	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_ELECOM, USB_DEVICE_ID_ELECOM_BM084) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_ELO, USB_DEVICE_ID_ELO_TS2515) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_EMS, USB_DEVICE_ID_EMS_TRIO_LINKER_PLUS_II) },
+diff --git a/drivers/hid/hid-ids.h b/drivers/hid/hid-ids.h
+index 206f750..c1732e1 100644
+--- a/drivers/hid/hid-ids.h
++++ b/drivers/hid/hid-ids.h
+@@ -235,6 +235,7 @@
+ #define USB_DEVICE_ID_DWAV_EGALAX_MULTITOUCH2	0x72a1
+ #define USB_DEVICE_ID_DWAV_EGALAX_MULTITOUCH3	0x480e
+ #define USB_DEVICE_ID_DWAV_EGALAX_MULTITOUCH4	0x726b
++#define USB_DEVICE_ID_DWAV_EGALAX_MULTITOUCH5	0xa001
+ 
+ #define USB_VENDOR_ID_ELECOM		0x056e
+ #define USB_DEVICE_ID_ELECOM_BM084	0x0061
+diff --git a/drivers/hid/hid-multitouch.c b/drivers/hid/hid-multitouch.c
+index 685d8e4..0099bc4 100644
+--- a/drivers/hid/hid-multitouch.c
++++ b/drivers/hid/hid-multitouch.c
+@@ -646,6 +646,9 @@ static const struct hid_device_id mt_devices[] = {
+ 	{  .driver_data = MT_CLS_EGALAX,
+ 		HID_USB_DEVICE(USB_VENDOR_ID_DWAV,
+ 			USB_DEVICE_ID_DWAV_EGALAX_MULTITOUCH4) },
++	{  .driver_data = MT_CLS_EGALAX,
++		HID_USB_DEVICE(USB_VENDOR_ID_DWAV,
++			USB_DEVICE_ID_DWAV_EGALAX_MULTITOUCH5) },
+ 
+ 	/* Elo TouchSystems IntelliTouch Plus panel */
+ 	{ .driver_data = MT_CLS_DUAL_NSMU_CONTACTID,
+-- 
+2.5.0
+

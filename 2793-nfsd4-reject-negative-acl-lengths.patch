@@ -1,0 +1,39 @@
+From 7e36f505caf7882b6cc89ecedcd7f26749ef917a Mon Sep 17 00:00:00 2001
+From: "J. Bruce Fields" <bfields@redhat.com>
+Date: Tue, 26 Mar 2013 14:11:13 -0400
+Subject: [PATCH 2793/3390] nfsd4: reject "negative" acl lengths
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+commit 64a817cfbded8674f345d1117b117f942a351a69 upstream.
+
+Since we only enforce an upper bound, not a lower bound, a "negative"
+length can get through here.
+
+The symptom seen was a warning when we attempt to a kmalloc with an
+excessive size.
+
+Reported-by: Toralf Förster <toralf.foerster@gmx.de>
+Signed-off-by: J. Bruce Fields <bfields@redhat.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ fs/nfsd/nfs4xdr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fs/nfsd/nfs4xdr.c b/fs/nfsd/nfs4xdr.c
+index ecdd18a..59ac3f4 100644
+--- a/fs/nfsd/nfs4xdr.c
++++ b/fs/nfsd/nfs4xdr.c
+@@ -262,7 +262,7 @@ nfsd4_decode_fattr(struct nfsd4_compoundargs *argp, u32 *bmval,
+ 		iattr->ia_valid |= ATTR_SIZE;
+ 	}
+ 	if (bmval[0] & FATTR4_WORD0_ACL) {
+-		int nace;
++		u32 nace;
+ 		struct nfs4_ace *ace;
+ 
+ 		READ_BUF(4); len += 4;
+-- 
+2.5.0
+

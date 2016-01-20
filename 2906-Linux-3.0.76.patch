@@ -1,0 +1,24 @@
+From 27a2f7c50c87691fa4b6a0a8a77f779b8bbe648c Mon Sep 17 00:00:00 2001
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Date: Wed, 1 May 2013 08:57:55 -0700
+Subject: [PATCH 2906/3390] Linux 3.0.76
+
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 30ad2fe..9c40e47 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,6 +1,6 @@
+ VERSION = 3
+ PATCHLEVEL = 0
+-SUBLEVEL = 75
++SUBLEVEL = 76
+ EXTRAVERSION =
+ NAME = Sneaky Weasel
+ 
+-- 
+2.5.0
+

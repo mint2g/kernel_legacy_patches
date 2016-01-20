@@ -1,0 +1,51 @@
+From 56448baac0c3d52501dc26868e15caba1811866d Mon Sep 17 00:00:00 2001
+From: Federico Vaga <federico.vaga@gmail.com>
+Date: Sat, 29 Oct 2011 09:47:39 +0200
+Subject: [PATCH 0393/3390] Staging: comedi: fix signal handling in read and
+ write
+
+commit 6a9ce6b654e491981f6ef7e214cbd4f63e033848 upstream.
+
+After sleeping on a wait queue, signal_pending(current) should be
+checked (not before sleeping).
+
+Acked-by: Alessandro Rubini <rubini@gnudd.com>
+Signed-off-by: Federico Vaga <federico.vaga@gmail.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+---
+ drivers/staging/comedi/comedi_fops.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/staging/comedi/comedi_fops.c b/drivers/staging/comedi/comedi_fops.c
+index 69bd6f0..63e50f7 100644
+--- a/drivers/staging/comedi/comedi_fops.c
++++ b/drivers/staging/comedi/comedi_fops.c
+@@ -1673,11 +1673,11 @@ static ssize_t comedi_write(struct file *file, const char __user *buf,
+ 				retval = -EAGAIN;
+ 				break;
+ 			}
++			schedule();
+ 			if (signal_pending(current)) {
+ 				retval = -ERESTARTSYS;
+ 				break;
+ 			}
+-			schedule();
+ 			if (!s->busy)
+ 				break;
+ 			if (s->busy != file) {
+@@ -1780,11 +1780,11 @@ static ssize_t comedi_read(struct file *file, char __user *buf, size_t nbytes,
+ 				retval = -EAGAIN;
+ 				break;
+ 			}
++			schedule();
+ 			if (signal_pending(current)) {
+ 				retval = -ERESTARTSYS;
+ 				break;
+ 			}
+-			schedule();
+ 			if (!s->busy) {
+ 				retval = 0;
+ 				break;
+-- 
+2.5.0
+

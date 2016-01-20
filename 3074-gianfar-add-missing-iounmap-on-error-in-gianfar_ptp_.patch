@@ -1,0 +1,33 @@
+From cc56da01f9325fd72ebf4d759b8333020bdc5f6c Mon Sep 17 00:00:00 2001
+From: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+Date: Thu, 16 May 2013 22:25:34 +0000
+Subject: [PATCH 3074/3390] gianfar: add missing iounmap() on error in
+ gianfar_ptp_probe()
+
+[ Upstream commit e5f5e380e0f3bb11f04ca5bc66a551e58e0ad26e ]
+
+Add the missing iounmap() before return from gianfar_ptp_probe()
+in the error handling case.
+
+Signed-off-by: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/net/gianfar_ptp.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/gianfar_ptp.c b/drivers/net/gianfar_ptp.c
+index c413479..68cfa08 100644
+--- a/drivers/net/gianfar_ptp.c
++++ b/drivers/net/gianfar_ptp.c
+@@ -521,6 +521,7 @@ static int gianfar_ptp_probe(struct platform_device *dev)
+ 	return 0;
+ 
+ no_clock:
++	iounmap(etsects->regs);
+ no_ioremap:
+ 	release_resource(etsects->rsrc);
+ no_resource:
+-- 
+2.5.0
+
